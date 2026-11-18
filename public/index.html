@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Japan: the complete guide + planner | itsjustinjapan</title>
+<meta name="description" content="The 2027 Japan guide and day-by-day trip planner from @itsjustinjapan. Everything I'd tell a friend before their first trip.">
+<link rel="icon" href="/brand/face-ink.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <img src="/brand/face-ink.svg" alt="">
+    <a href="/">itsjustinjapan</a>
+  </header>
+
+  <div class="hero">
+    <div>
+      <p class="kicker">2027 edition · Guide + planner bundle</p>
+      <h1>Japan <em>the complete guide</em></h1>
+      <p class="lede">Everything I'd tell a friend before their first trip to Japan, in one PDF. Plus my day-by-day Canva planner, so you can build your itinerary as you read.</p>
+      <p class="muted">Instant download. Read it on your phone, tablet or laptop.</p>
+    </div>
+
+    <form class="buy" id="buy" method="post" action="/api/checkout">
+      <h2>The bundle</h2>
+      <div class="price"><span data-price="bundle">&nbsp;</span> <small data-currency></small></div>
+      <ul>
+        <li>Japan: the complete guide (PDF)</li>
+        <li>14-day Japan planner (Canva template)</li>
+      </ul>
+
+      <label class="bump">
+        <input type="checkbox" name="upgrade" value="1" id="upgrade">
+        <div>
+          <strong>Yes, add the 21-day planner for <span data-price="upgrade">a little extra</span></strong>
+          <span>Got three weeks? The 21-day version adds more days and more places to fit in.</span>
+        </div>
+      </label>
+
+      <button class="btn" type="submit" id="buy-btn">Get the guide</button>
+      <p class="fine">Secure checkout with Stripe. Have a code? Add it on the next page.</p>
+    </form>
+  </div>
+</div>
+
+<section class="band">
+  <div class="wrap">
+    <p class="kicker">What's inside</p>
+    <h2>Nine parts, start to finish</h2>
+    <ol class="parts">
+      <li>Before you go: visas, when to go, eSIMs, apps, packing</li>
+      <li>Money and shopping: cash, tax-free, what's worth buying</li>
+      <li>Getting around: IC cards, trains, arriving, luggage, taxis</li>
+      <li>Where to stay: picking a base, and beating jetlag</li>
+      <li>Etiquette and everyday life: onsen, ryokan, toilets, mistakes</li>
+      <li>Eating and drinking: eating like a local, konbini, dietary needs</li>
+      <li>Where to go: Tokyo, Hakone and Fuji, Kyoto, Osaka, Nara, Kamakura</li>
+      <li>Practical stuff: safety and sample itineraries</li>
+      <li>Until next time</li>
+    </ol>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <p class="kicker">How it works</p>
+    <h2>Read it, then plan it</h2>
+    <div class="grid three">
+      <div class="card"><h3>1. Download</h3><p>You get the PDF straight after checkout, and a copy of the links by email.</p></div>
+      <div class="card"><h3>2. Read</h3><p>Short sections you can read on the plane. My pick is always up front.</p></div>
+      <div class="card"><h3>3. Plan</h3><p>Open the planner in Canva and fill in your days. It's your own copy to edit.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap narrow" style="padding-top:0;padding-bottom:0">
+    <p class="kicker">Questions</p>
+    <h2>Good to know</h2>
+    <details><summary>What format is it?</summary><p>The guide is a PDF. The planner is a Canva template: the link opens a copy in your own free Canva account.</p></details>
+    <details><summary>Do I need Canva Pro?</summary><p>No, a free Canva account works.</p></details>
+    <details><summary>What's the difference between the 14 and 21-day planner?</summary><p>Same layout, more days. Pick the one that matches your trip, or grab both.</p></details>
+    <details><summary>I lost my download link</summary><p>Reply to your order email and I'll send a fresh one.</p></details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">© itsjustinjapan · <a href="https://instagram.com/itsjustinjapan">@itsjustinjapan</a></div>
+</footer>
+
+<script src="/app.js" defer></script>
+</body>
+</html>

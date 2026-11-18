@@ -1,0 +1,25 @@
+# Cloudflare Pages project for the IJIJ shop.
+# Static pages live in public/, server code in functions/.
+name = "ijij-shop"
+compatibility_date = "2026-11-01"
+pages_build_output_dir = "public"
+
+[vars]
+# Public URL of the shop, no trailing slash. Overridden per environment in the dashboard.
+SITE_URL = "http://localhost:8788"
+EMAIL_FROM = "Justin from itsjustinjapan <hello@example.com>"
+# How long a download link works, and how many times.
+DOWNLOAD_DAYS = "60"
+DOWNLOAD_MAX = "15"
+# R2 object key of the guide PDF.
+GUIDE_KEY = "japan-the-complete-guide.pdf"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ijij-shop"
+database_id = "REPLACE_WITH_D1_ID"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "ijij-shop-files"
