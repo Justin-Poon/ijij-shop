@@ -17,7 +17,7 @@ GUIDE_KEY = "japan-the-complete-guide.pdf"
 [[d1_databases]]
 binding = "DB"
 database_name = "ijij-shop"
-database_id = "REPLACE_WITH_D1_ID"
+database_id = "d72ff882-c071-4cc1-b8e8-9ed09204de9e"
 migrations_dir = "migrations"
 
 [[r2_buckets]]
