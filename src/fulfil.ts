@@ -125,7 +125,9 @@ export async function fulfil(env: Env, p: Purchase): Promise<Delivery> {
       .run();
     if (claimed.meta.changes === 1) {
       try {
-        await sendDeliveryEmail(env, delivery);
+        const sent = await sendDeliveryEmail(env, delivery);
+        // Email not set up yet: leave the order unsent so it can be emailed later.
+        if (!sent) await env.DB.prepare(`UPDATE orders SET emailed_at = NULL WHERE id = ?`).bind(order.id).run();
       } catch (err) {
         // Release the claim so Stripe's webhook retry (or a resend) can try again.
         await env.DB.prepare(`UPDATE orders SET emailed_at = NULL WHERE id = ?`).bind(order.id).run();

@@ -43,10 +43,11 @@ ${d.planners.map((p) => link(p.url, `Open the ${p.label.replace(" (Canva templat
   return { subject: "Your Japan guide and planner", text, html };
 }
 
-export async function sendDeliveryEmail(env: Env, d: Delivery): Promise<void> {
+/** Returns false if email isn't configured, so the caller can try again later. */
+export async function sendDeliveryEmail(env: Env, d: Delivery): Promise<boolean> {
   if (!env.RESEND_API_KEY) {
-    console.log(`[email skipped: no RESEND_API_KEY] to=${d.order.email} link=${d.downloadUrl}`);
-    return;
+    console.log(`[email skipped: no RESEND_API_KEY] order=${d.order.id}`);
+    return false;
   }
   const { subject, text, html } = deliveryEmail(env, d);
   const res = await fetch("https://api.resend.com/emails", {
@@ -55,4 +56,5 @@ export async function sendDeliveryEmail(env: Env, d: Delivery): Promise<void> {
     body: JSON.stringify({ from: env.EMAIL_FROM, to: [d.order.email], subject, text, html }),
   });
   if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()}`);
+  return true;
 }

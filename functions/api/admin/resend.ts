@@ -24,6 +24,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
   const token = await issueDownloadToken(env, order.id);
   const delivery = { order, downloadUrl: downloadUrl(env, token), planners: plannersFor(env, order.has_21 === 1) };
-  await sendDeliveryEmail(env, delivery);
-  return json({ sent: true, order: order.id, downloadUrl: delivery.downloadUrl });
+  const sent = await sendDeliveryEmail(env, delivery);
+  if (sent) await env.DB.prepare(`UPDATE orders SET emailed_at = ? WHERE id = ?`).bind(new Date().toISOString(), order.id).run();
+  return json({ sent, order: order.id, downloadUrl: delivery.downloadUrl });
 };
