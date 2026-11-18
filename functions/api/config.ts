@@ -3,6 +3,7 @@
 import type { Env } from "../../src/env.ts";
 import { quote } from "../../src/pricing.ts";
 import { formatMoney, json } from "../../src/util.ts";
+import { StripeError } from "../../src/stripe.ts";
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env, waitUntil }) => {
   // The cache is only a speed-up: if it's unavailable, go straight to Stripe.
@@ -27,6 +28,8 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, waitUntil
     return res;
   } catch (err) {
     console.error("config failed", err);
-    return json({ error: "unavailable" }, 502);
+    // Stripe's own message (keys are masked by Stripe) helps diagnose setup problems.
+    const detail = err instanceof StripeError ? err.message : undefined;
+    return json({ error: "unavailable", detail }, 502);
   }
 };
