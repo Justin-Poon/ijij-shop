@@ -5,14 +5,17 @@ compatibility_date = "2026-11-01"
 pages_build_output_dir = "public"
 
 [vars]
-# Public URL of the shop, no trailing slash. Overridden per environment in the dashboard.
-SITE_URL = "http://localhost:8788"
+# Public URL of the shop, no trailing slash. Local dev overrides it in .dev.vars.
+SITE_URL = "https://ijij-shop.pages.dev"
 EMAIL_FROM = "Justin from itsjustinjapan <hello@example.com>"
 # How long a download link works, and how many times.
 DOWNLOAD_DAYS = "60"
 DOWNLOAD_MAX = "15"
 # R2 object key of the guide PDF.
 GUIDE_KEY = "japan-the-complete-guide.pdf"
+# Stripe prices (TEST mode). Swap for the live price IDs at launch.
+STRIPE_PRICE_BUNDLE = "price_1UdEfFAg0KVyXnxV09UoRCXo"
+STRIPE_PRICE_UPGRADE = "price_1UdEfIAg0KVyXnxVQjL62lxe"
 
 [[d1_databases]]
 binding = "DB"
