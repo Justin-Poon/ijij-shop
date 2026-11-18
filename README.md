@@ -148,3 +148,9 @@ The end-to-end run covers:
 
 - Discount codes are managed in Stripe (Products → Coupons → promotion codes). Because the checkout uses PaymentIntents rather than Stripe's hosted Checkout, Stripe doesn't count redemptions automatically. A "max redemptions" limit therefore won't trigger, though expiry dates and minimum amounts do. Each order records the code it used.
 - The Canva planner links are secrets (`PLANNER_14_URL`, `PLANNER_21_URL`). Use the **template** links, never the live designs.
+
+## Cover
+
+- **Shop images:** `public/cover.webp` and `public/cover.jpg` show the cover on the product page. `public/og-image.jpg` is the link preview for social sites.
+- **Print files:** `assets/itsjustinjapan-guide-cover-2027-print.jpg` (2480 × 3508, A4 at 300 dpi) and `assets/cover-print.pdf` (A4, with vector text).
+- **Photo credit:** the cover photo is by **zhgn_ on Unsplash** (photo `_7RtWTAXvms`), used under the Unsplash licence. The sky was extended upward and the photo cropped to A4. Credit it on the guide's Photo credits page.

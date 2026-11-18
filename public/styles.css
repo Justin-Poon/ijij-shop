@@ -77,6 +77,11 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: 24px 0; }
   padding: 16px 12px; position: relative; z-index: 2;
   border-top: 10px solid var(--maroon);
 }
+.cover-img {
+  width: 190px; height: auto; border-radius: 4px; position: relative; z-index: 2;
+  box-shadow: 0 18px 40px rgba(107, 18, 52, .25), 0 2px 6px rgba(0,0,0,.1);
+}
+.cover-wrap picture { display: block; position: relative; z-index: 2; }
 .cover.planner {
   width: 130px; z-index: 1; margin-left: -34px; transform: rotate(6deg) translateY(10px);
   padding-left: 40px; /* keep the text clear of the guide cover that overlaps it */
@@ -92,7 +97,7 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: 24px 0; }
 .cover-by { font-size: .6rem; color: var(--muted); letter-spacing: .04em; }
 @media (min-width: 900px) {
   .cover-wrap { min-height: 360px; margin-top: 0; }
-  .cover { width: 210px; }
+  .cover-img { width: 240px; }
   .cover.planner { width: 160px; }
   .cover-title { font-size: 3.2rem; }
 }
