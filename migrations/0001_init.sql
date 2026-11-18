@@ -1,12 +1,14 @@
--- One row per paid Stripe Checkout session.
+-- One row per successful payment.
 CREATE TABLE orders (
-  id            TEXT PRIMARY KEY,          -- Stripe Checkout session id (cs_...)
+  id            TEXT PRIMARY KEY,          -- Stripe PaymentIntent id (pi_...)
   email         TEXT NOT NULL,
   name          TEXT,
   has_21        INTEGER NOT NULL DEFAULT 0, -- bought the 21-day upgrade
   amount_total  INTEGER NOT NULL,           -- in the smallest currency unit
   currency      TEXT NOT NULL,
   discount      INTEGER NOT NULL DEFAULT 0,
+  promo_code    TEXT,
+  marketing     INTEGER NOT NULL DEFAULT 0, -- ticked "send me emails"
   payment_intent TEXT,
   created_at    TEXT NOT NULL,
   emailed_at    TEXT,                       -- set once the delivery email is sent

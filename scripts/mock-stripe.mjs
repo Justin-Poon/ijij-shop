@@ -4,7 +4,12 @@ import http from "node:http";
 
 const port = Number(process.argv[2] || 12111);
 const site = process.argv[3] || "http://localhost:8788";
-const sessions = new Map();
+const intents = new Map();
+const promos = {
+  JAPLAN10: { id: "promo_1", code: "JAPLAN10", active: true, expires_at: null, max_redemptions: null, times_redeemed: 0, coupon: { id: "c1", valid: true, percent_off: 10, amount_off: null, currency: null }, restrictions: { minimum_amount: null } },
+  FREEBIE: { id: "promo_2", code: "FREEBIE", active: true, expires_at: null, max_redemptions: null, times_redeemed: 0, coupon: { id: "c2", valid: true, percent_off: 100, amount_off: null, currency: null }, restrictions: { minimum_amount: null } },
+  OLDCODE: { id: "promo_3", code: "OLDCODE", active: true, expires_at: 1000, max_redemptions: null, times_redeemed: 0, coupon: { id: "c3", valid: true, percent_off: 20, amount_off: null, currency: null }, restrictions: { minimum_amount: null } },
+};
 const prices = {
   price_bundle: { id: "price_bundle", unit_amount: 3900, currency: "aud", active: true },
   price_upgrade: { id: "price_upgrade", unit_amount: 1000, currency: "aud", active: true },
@@ -26,33 +31,45 @@ http
       res.writeHead(status, { "Content-Type": "application/json" });
       res.end(JSON.stringify(data));
     };
+    // Test hook: pretend the buyer completed payment (or it failed).
+    const hook = url.pathname.match(/^\/__(succeed|fail)\/(pi_[^/]+)$/);
+    if (hook) {
+      const pi = intents.get(hook[2]);
+      if (!pi) return send(404, {});
+      pi.status = hook[1] === "succeed" ? "succeeded" : "requires_payment_method";
+      return send(200, pi);
+    }
     if (req.headers.authorization !== "Bearer sk_test_mock") return send(401, { error: { message: "bad key" } });
 
-    if (req.method === "POST" && url.pathname === "/v1/checkout/sessions") {
+    if (req.method === "POST" && url.pathname === "/v1/payment_intents") {
       const p = await readBody(req);
-      const id = `cs_test_mock${++n}`;
-      const items = [];
-      for (let i = 0; p.has(`line_items[${i}][price]`); i++) items.push(p.get(`line_items[${i}][price]`));
-      const amount = items.reduce((s, pid) => s + prices[pid].unit_amount, 0);
-      const email = url.searchParams.get("email") || `buyer${n}@example.com`;
-      sessions.set(id, {
+      const id = `pi_mock${++n}`;
+      const metadata = {};
+      for (const [k, v] of p) {
+        const m = k.match(/^metadata\[(.+)\]$/);
+        if (m) metadata[m[1]] = v;
+      }
+      const pi = {
         id,
-        status: "complete",
-        payment_status: "paid",
-        amount_total: amount,
-        currency: "aud",
-        payment_intent: `pi_mock${n}`,
-        customer_details: { email, name: "Test Buyer" },
-        total_details: { amount_discount: 0 },
-        line_items: { data: items.map((pid) => ({ price: { id: pid }, quantity: 1 })) },
-        _success: p.get("success_url"),
-      });
-      return send(200, { id, url: `${site}/__mock_checkout/${id}` });
+        object: "payment_intent",
+        amount: Number(p.get("amount")),
+        currency: p.get("currency"),
+        status: "requires_payment_method",
+        client_secret: `${id}_secret_test`,
+        receipt_email: p.get("receipt_email"),
+        metadata,
+      };
+      intents.set(id, pi);
+      return send(200, pi);
     }
-    const m = url.pathname.match(/^\/v1\/checkout\/sessions\/([^/]+)$/);
+    const m = url.pathname.match(/^\/v1\/payment_intents\/([^/]+)$/);
     if (req.method === "GET" && m) {
-      const s = sessions.get(m[1]);
-      return s ? send(200, s) : send(404, { error: { message: "No such checkout.session" } });
+      const pi = intents.get(m[1]);
+      return pi ? send(200, pi) : send(404, { error: { message: "No such payment_intent" } });
+    }
+    if (req.method === "GET" && url.pathname === "/v1/promotion_codes") {
+      const promo = promos[(url.searchParams.get("code") || "").toUpperCase()]; // Stripe matches codes case-insensitively
+      return send(200, { data: promo ? [promo] : [] });
     }
     const pm = url.pathname.match(/^\/v1\/prices\/([^/]+)$/);
     if (req.method === "GET" && pm) {

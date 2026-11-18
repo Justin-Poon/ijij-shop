@@ -5,16 +5,38 @@ export interface StripeConfig {
   STRIPE_API_BASE?: string;
 }
 
-export interface CheckoutSession {
+// Pinned so response shapes (e.g. promotion codes) don't change under us when Stripe
+// releases a new API version.
+export const STRIPE_API_VERSION = "2024-06-20";
+
+export interface PaymentIntent {
   id: string;
-  status: string | null;
-  payment_status: "paid" | "unpaid" | "no_payment_required";
-  amount_total: number | null;
+  object: "payment_intent";
+  amount: number;
+  currency: string;
+  status: string; // "succeeded" when paid
+  client_secret: string;
+  receipt_email: string | null;
+  metadata: Record<string, string>;
+}
+
+export interface Coupon {
+  id: string;
+  valid: boolean;
+  percent_off: number | null;
+  amount_off: number | null;
   currency: string | null;
-  payment_intent: string | null;
-  customer_details: { email: string | null; name: string | null } | null;
-  total_details?: { amount_discount: number } | null;
-  line_items?: { data: { price: { id: string } | null; quantity: number | null }[] };
+}
+
+export interface PromotionCode {
+  id: string;
+  code: string;
+  active: boolean;
+  expires_at: number | null;
+  max_redemptions: number | null;
+  times_redeemed: number;
+  coupon: Coupon;
+  restrictions?: { minimum_amount: number | null; minimum_amount_currency: string | null };
 }
 
 export interface Price {
@@ -62,6 +84,7 @@ async function call<T>(cfg: StripeConfig, method: "GET" | "POST", path: string, 
     method,
     headers: {
       Authorization: `Bearer ${cfg.STRIPE_SECRET_KEY}`,
+      "Stripe-Version": STRIPE_API_VERSION,
       "Content-Type": "application/x-www-form-urlencoded",
     },
   };
@@ -78,14 +101,18 @@ async function call<T>(cfg: StripeConfig, method: "GET" | "POST", path: string, 
   return data as T;
 }
 
-export function createCheckoutSession(cfg: StripeConfig, params: Record<string, unknown>) {
-  return call<CheckoutSession & { url: string }>(cfg, "POST", "checkout/sessions", params);
+export function createPaymentIntent(cfg: StripeConfig, params: Record<string, unknown>) {
+  return call<PaymentIntent>(cfg, "POST", "payment_intents", params);
 }
 
-export function getCheckoutSession(cfg: StripeConfig, id: string) {
-  return call<CheckoutSession>(cfg, "GET", `checkout/sessions/${encodeURIComponent(id)}`, {
-    expand: ["line_items"],
-  });
+export function getPaymentIntent(cfg: StripeConfig, id: string) {
+  return call<PaymentIntent>(cfg, "GET", `payment_intents/${encodeURIComponent(id)}`);
+}
+
+/** Look up an active promotion code (what customers type, e.g. JAPLAN10). */
+export async function findPromotionCode(cfg: StripeConfig, code: string): Promise<PromotionCode | null> {
+  const res = await call<{ data: PromotionCode[] }>(cfg, "GET", "promotion_codes", { code, active: true, limit: 1 });
+  return res.data[0] ?? null;
 }
 
 export function getPrice(cfg: StripeConfig, id: string) {

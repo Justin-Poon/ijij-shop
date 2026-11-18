@@ -1,19 +1,27 @@
-// GET /api/order?session_id=cs_...
-// Used by the thank-you page. Fulfils the order here too, in case the webhook is slow.
+// GET /api/order?payment_intent=pi_...&payment_intent_client_secret=...
+// Used by the thank-you page (Stripe adds both params to the return URL).
+// The client secret proves the caller is the buyer. Fulfils here too, in case the webhook is slow.
 
 import type { Env } from "../../src/env.ts";
-import { getCheckoutSession, StripeError } from "../../src/stripe.ts";
-import { fulfil } from "../../src/fulfil.ts";
+import { getPaymentIntent, StripeError } from "../../src/stripe.ts";
+import { fulfil, purchaseFromIntent } from "../../src/fulfil.ts";
 import { json } from "../../src/util.ts";
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
-  const id = new URL(request.url).searchParams.get("session_id") ?? "";
-  if (!/^cs_[A-Za-z0-9_]+$/.test(id)) return json({ error: "bad session id" }, 400);
+  const q = new URL(request.url).searchParams;
+  const id = q.get("payment_intent") ?? "";
+  const secret = q.get("payment_intent_client_secret") ?? "";
+  if (!/^pi_[A-Za-z0-9_]+$/.test(id) || !secret) return json({ error: "bad request" }, 400);
 
   try {
-    const session = await getCheckoutSession(env, id);
-    const delivery = await fulfil(env, session);
-    if (!delivery) return json({ status: "pending" }, 202);
+    const pi = await getPaymentIntent(env, id);
+    if (pi.client_secret !== secret) return json({ error: "not found" }, 404);
+
+    if (pi.status === "processing") return json({ status: "pending" }, 202);
+    const purchase = purchaseFromIntent(pi);
+    if (!purchase) return json({ status: "failed" }, 402);
+
+    const delivery = await fulfil(env, purchase);
     if (delivery.order.refunded_at) return json({ status: "refunded" }, 410);
     return json({
       status: "paid",

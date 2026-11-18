@@ -8,7 +8,7 @@
 <link rel="icon" href="/brand/face-ink.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -23,17 +23,27 @@
 <script>
 (function () {
   const box = document.getElementById("status");
-  const id = new URLSearchParams(location.search).get("session_id");
+  const qs = new URLSearchParams(location.search);
+  const id = qs.get("payment_intent");
+  const secret = qs.get("payment_intent_client_secret");
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   const fail = (msg) => (box.innerHTML = `<p>${msg}</p><p class="muted">Your payment is safe. Check your email for your links, or reply to the order email and I'll sort it out.</p>`);
-  if (!id) return fail("I couldn't find your order details on this page.");
+  if (!id || !secret) return fail("I couldn't find your order details on this page.");
+  if (qs.get("redirect_status") === "failed") {
+    box.innerHTML = '<p>That payment didn\'t go through, so you haven\'t been charged.</p><p><a class="btn" href="/">Try again</a></p>';
+    return;
+  }
 
   let tries = 0;
   async function load() {
     try {
-      const r = await fetch(`/api/order?session_id=${encodeURIComponent(id)}`);
+      const r = await fetch(`/api/order?payment_intent=${encodeURIComponent(id)}&payment_intent_client_secret=${encodeURIComponent(secret)}`);
       if (r.status === 202 && tries++ < 10) return setTimeout(load, 2000);
       if (r.status === 404 || r.status === 400) return fail("I couldn't find that order.");
+      if (r.status === 402) {
+        box.innerHTML = '<p>That payment didn\'t go through, so you haven\'t been charged.</p><p><a class="btn" href="/">Try again</a></p>';
+        return;
+      }
       if (r.status === 202) return fail("Your payment is still processing. Your links will arrive by email as soon as it clears.");
       const d = await r.json();
       if (d.status === "refunded") return fail("This order was refunded.");
@@ -42,7 +52,7 @@
         <p>Your guide and planner are ready. I've also emailed these links to <strong>${esc(d.email)}</strong>.</p>
         <div class="deliver">
           <a class="btn" href="${esc(d.downloadUrl)}">Download the guide (PDF)</a>
-          ${d.planners.map((p) => `<a class="btn" style="background:#fff;color:var(--maroon);border:2px solid var(--maroon)" href="${esc(p.url)}" target="_blank" rel="noopener">Open the ${esc(p.label.replace(" (Canva template)", ""))}</a>`).join("")}
+          ${d.planners.map((p) => `<a class="btn ghost" href="${esc(p.url)}" target="_blank" rel="noopener">Open the ${esc(p.label.replace(" (Canva template)", ""))}</a>`).join("")}
         </div>
         <p class="muted">The planner opens as a copy in your own Canva account. Save the PDF somewhere you'll find it in Japan.</p>`;
     } catch (e) {

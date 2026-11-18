@@ -4,95 +4,128 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Japan: the complete guide + planner | itsjustinjapan</title>
-<meta name="description" content="The 2027 Japan guide and day-by-day trip planner from @itsjustinjapan. Everything I'd tell a friend before their first trip.">
+<meta name="description" content="The 2027 Japan guide and day-by-day Canva trip planner from @itsjustinjapan.">
+<meta property="og:title" content="Japan: the complete guide + planner">
+<meta property="og:description" content="Everything I'd tell a friend before their first trip to Japan, plus my day-by-day planner.">
 <link rel="icon" href="/brand/face-ink.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
+<script src="https://js.stripe.com/v3/" defer></script>
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <img src="/brand/face-ink.svg" alt="">
-    <a href="/">itsjustinjapan</a>
-  </header>
+<div class="store">
 
-  <div class="hero">
+  <!-- Creator card: left column on desktop, a compact row on phones -->
+  <aside class="creator">
+    <img class="avatar" src="/brand/face-ink.svg" alt="">
     <div>
-      <p class="kicker">2027 edition · Guide + planner bundle</p>
-      <h1>Japan <em>the complete guide</em></h1>
-      <p class="lede">Everything I'd tell a friend before their first trip to Japan, in one PDF. Plus my day-by-day Canva planner, so you can build your itinerary as you read.</p>
-      <p class="muted">Instant download. Read it on your phone, tablet or laptop.</p>
+      <p class="creator-name">Justin</p>
+      <p class="creator-bio">Japan trips, tips and itineraries at @itsjustinjapan</p>
+      <div class="socials">
+        <a href="https://instagram.com/itsjustinjapan" aria-label="Instagram"><span class="ic" style="--i:url(/icons/instagram-logo.svg)"></span></a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="product">
+    <div class="cover-wrap">
+      <!-- Swap this for a mockup image when you have one: <img src="/cover.png" alt="..."> -->
+      <div class="cover" role="img" aria-label="Japan: the complete guide, 2027 edition">
+        <span class="cover-ed">2027 Edition</span>
+        <span class="cover-title">Japan</span>
+        <span class="cover-sub">the complete guide</span>
+        <span class="cover-rule"></span>
+        <span class="cover-by">@itsjustinjapan</span>
+      </div>
+      <div class="cover planner" aria-hidden="true">
+        <span class="cover-ed">Canva template</span>
+        <span class="cover-title small">Japan<br>planner</span>
+        <span class="cover-sub">14 or 21 days</span>
+      </div>
     </div>
 
-    <form class="buy" id="buy" method="post" action="/api/checkout">
-      <h2>The bundle</h2>
-      <div class="price"><span data-price="bundle">&nbsp;</span> <small data-currency></small></div>
-      <ul>
-        <li>Japan: the complete guide (PDF)</li>
-        <li>14-day Japan planner (Canva template)</li>
+    <h1 class="title">Japan: the complete guide + planner</h1>
+    <p class="price" data-price="bundle">&nbsp;</p>
+
+    <hr>
+
+    <div class="desc">
+      <p>Heading to Japan? Here's everything I'd tell you over a coffee before you go.</p>
+      <p>This is my complete <strong>2027 Japan guide</strong> (PDF): the practical stuff, from getting your eSIM sorted before you land to what to do when a ryokan hands you a yukata. It comes with my <strong>day-by-day Canva planner</strong>, so you can map out your trip as you read.</p>
+
+      <p>Inside you'll find:</p>
+      <ul class="inside">
+        <li><span class="ic" style="--i:url(/icons/airplane-tilt.svg)"></span>Before you go: entry, timing and what to sort at home</li>
+        <li><span class="ic" style="--i:url(/icons/device-mobile.svg)"></span>eSIMs, and the apps I actually use</li>
+        <li><span class="ic" style="--i:url(/icons/backpack.svg)"></span>Packing list, plus travelling in summer</li>
+        <li><span class="ic" style="--i:url(/icons/currency-jpy.svg)"></span>Cash, cards, IC cards and tax-free shopping</li>
+        <li><span class="ic" style="--i:url(/icons/train.svg)"></span>Trains, arriving, luggage forwarding and taxis</li>
+        <li><span class="ic" style="--i:url(/icons/bed.svg)"></span>Where to stay, and beating jetlag</li>
+        <li><span class="ic" style="--i:url(/icons/bathtub.svg)"></span>Onsen, ryokan and everyday etiquette</li>
+        <li><span class="ic" style="--i:url(/icons/bowl-food.svg)"></span>Eating like a local, konbini picks, dietary needs</li>
+        <li><span class="ic" style="--i:url(/icons/map-trifold.svg)"></span>Tokyo, Hakone and Fuji, Kyoto, Osaka, Nara and Kamakura</li>
+        <li><span class="ic" style="--i:url(/icons/translate.svg)"></span>Phrases worth knowing</li>
+        <li><span class="ic" style="--i:url(/icons/shield-check.svg)"></span>Staying safe, and sample itineraries</li>
+        <li><span class="ic" style="--i:url(/icons/calendar.svg)"></span>The 14-day Japan planner (Canva template)</li>
       </ul>
 
+      <p><strong>First trip or fifth, you'll land knowing what to do.</strong></p>
+      <p class="digital"><span class="ic" style="--i:url(/icons/device-mobile.svg)"></span>Digital download: a PDF guide plus Canva template links. Nothing is shipped.</p>
+    </div>
+
+    <!-- Reviews: filled from /reviews.json. Hidden until there's at least one. -->
+    <section class="reviews" id="reviews" hidden>
+      <hr>
+      <div class="review-track" id="review-track"></div>
+      <div class="review-nav">
+        <button type="button" id="rev-prev" aria-label="Previous reviews"><span class="ic" style="--i:url(/icons/arrow-left.svg)"></span></button>
+        <button type="button" id="rev-next" aria-label="More reviews"><span class="ic" style="--i:url(/icons/arrow-right.svg)"></span></button>
+      </div>
+    </section>
+
+    <hr>
+
+    <form class="checkout" id="checkout" novalidate>
+      <h2>Grab your copy</h2>
+
+      <input class="field" id="name" name="name" autocomplete="name" placeholder="Enter your name" required>
+      <input class="field" id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="Enter your email" required>
+      <label class="consent"><input type="checkbox" id="marketing"> Send me Japan tips and new guides by email</label>
+
       <label class="bump">
-        <input type="checkbox" name="upgrade" value="1" id="upgrade">
+        <input type="checkbox" id="upgrade">
         <div>
-          <strong>Yes, add the 21-day planner for <span data-price="upgrade">a little extra</span></strong>
+          <strong>Yes! Add the 21-day planner for <span data-price="upgrade">a little extra</span></strong>
           <span>Got three weeks? The 21-day version adds more days and more places to fit in.</span>
         </div>
       </label>
 
-      <button class="btn" type="submit" id="buy-btn">Get the guide</button>
-      <p class="fine">Secure checkout with Stripe. Have a code? Add it on the next page.</p>
+      <label class="label" for="code">Discount code</label>
+      <div class="code-row">
+        <input class="field" id="code" placeholder="Enter promo code here" autocapitalize="characters" autocomplete="off">
+        <button type="button" id="apply">Apply</button>
+      </div>
+      <p class="code-msg" id="code-msg" aria-live="polite"></p>
+
+      <div class="lines">
+        <div class="line" id="line-discount" hidden><span>Discount</span><span class="dots"></span><span id="discount"></span></div>
+        <div class="line total"><span>Total:</span><span class="dots"></span><span id="total">&nbsp;</span></div>
+      </div>
+
+      <div id="payment-element" class="payment"></div>
+      <p class="pay-error" id="pay-error" role="alert"></p>
+
+      <button class="purchase" id="purchase" type="submit" disabled>Purchase</button>
+      <p class="secure"><span class="ic" style="--i:url(/icons/lock.svg)"></span>Secure payment with Stripe</p>
+      <noscript><p class="pay-error">Please turn on JavaScript to check out.</p></noscript>
     </form>
-  </div>
+  </main>
 </div>
 
-<section class="band">
-  <div class="wrap">
-    <p class="kicker">What's inside</p>
-    <h2>Nine parts, start to finish</h2>
-    <ol class="parts">
-      <li>Before you go: visas, when to go, eSIMs, apps, packing</li>
-      <li>Money and shopping: cash, tax-free, what's worth buying</li>
-      <li>Getting around: IC cards, trains, arriving, luggage, taxis</li>
-      <li>Where to stay: picking a base, and beating jetlag</li>
-      <li>Etiquette and everyday life: onsen, ryokan, toilets, mistakes</li>
-      <li>Eating and drinking: eating like a local, konbini, dietary needs</li>
-      <li>Where to go: Tokyo, Hakone and Fuji, Kyoto, Osaka, Nara, Kamakura</li>
-      <li>Practical stuff: safety and sample itineraries</li>
-      <li>Until next time</li>
-    </ol>
-  </div>
-</section>
+<footer>© itsjustinjapan</footer>
 
-<section class="band">
-  <div class="wrap">
-    <p class="kicker">How it works</p>
-    <h2>Read it, then plan it</h2>
-    <div class="grid three">
-      <div class="card"><h3>1. Download</h3><p>You get the PDF straight after checkout, and a copy of the links by email.</p></div>
-      <div class="card"><h3>2. Read</h3><p>Short sections you can read on the plane. My pick is always up front.</p></div>
-      <div class="card"><h3>3. Plan</h3><p>Open the planner in Canva and fill in your days. It's your own copy to edit.</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="band">
-  <div class="wrap narrow" style="padding-top:0;padding-bottom:0">
-    <p class="kicker">Questions</p>
-    <h2>Good to know</h2>
-    <details><summary>What format is it?</summary><p>The guide is a PDF. The planner is a Canva template: the link opens a copy in your own free Canva account.</p></details>
-    <details><summary>Do I need Canva Pro?</summary><p>No, a free Canva account works.</p></details>
-    <details><summary>What's the difference between the 14 and 21-day planner?</summary><p>Same layout, more days. Pick the one that matches your trip, or grab both.</p></details>
-    <details><summary>I lost my download link</summary><p>Reply to your order email and I'll send a fresh one.</p></details>
-  </div>
-</section>
-
-<footer>
-  <div class="wrap">© itsjustinjapan · <a href="https://instagram.com/itsjustinjapan">@itsjustinjapan</a></div>
-</footer>
-
-<script src="/app.js" defer></script>
+<script src="/product.js" defer></script>
 </body>
 </html>

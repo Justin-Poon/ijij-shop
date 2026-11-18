@@ -1,9 +1,9 @@
-// Turns a paid Checkout session into an order, a download link and a delivery email.
-// Safe to call more than once for the same session: the webhook and the thank-you page
+// Turns a successful payment into an order, a download link and a delivery email.
+// Safe to call more than once for the same payment: the webhook and the thank-you page
 // both call it, whichever arrives first does the work.
 
 import type { Env } from "./env.ts";
-import type { CheckoutSession } from "./stripe.ts";
+import type { PaymentIntent } from "./stripe.ts";
 import { sendDeliveryEmail } from "./email.ts";
 import { randomToken } from "./util.ts";
 
@@ -15,6 +15,8 @@ export interface OrderRow {
   amount_total: number;
   currency: string;
   discount: number;
+  promo_code: string | null;
+  marketing: number;
   payment_intent: string | null;
   created_at: string;
   emailed_at: string | null;
@@ -27,12 +29,37 @@ export interface Delivery {
   planners: { label: string; url: string }[];
 }
 
-export function isPaid(session: CheckoutSession): boolean {
-  return session.payment_status === "paid" || session.payment_status === "no_payment_required";
+/** What we need to record about a purchase. All of it is set by our server in metadata. */
+export interface Purchase {
+  id: string;
+  email: string;
+  name: string | null;
+  has21: boolean;
+  amount: number;
+  currency: string;
+  discount: number;
+  promoCode: string | null;
+  marketing: boolean;
 }
 
-export function boughtUpgrade(session: CheckoutSession, upgradePriceId: string): boolean {
-  return (session.line_items?.data ?? []).some((li) => li.price?.id === upgradePriceId);
+/** Null if the payment hasn't succeeded (yet) or isn't one of ours. */
+export function purchaseFromIntent(pi: PaymentIntent): Purchase | null {
+  if (pi.status !== "succeeded") return null;
+  const m = pi.metadata ?? {};
+  if (m.product !== "guide-bundle") return null;
+  const email = m.email || pi.receipt_email;
+  if (!email) throw new Error(`PaymentIntent ${pi.id} has no email`);
+  return {
+    id: pi.id,
+    email: email.toLowerCase(),
+    name: m.name || null,
+    has21: m.upgrade === "1",
+    amount: pi.amount,
+    currency: pi.currency,
+    discount: Number(m.discount || 0),
+    promoCode: m.promo_code || null,
+    marketing: m.marketing === "1",
+  };
 }
 
 export function plannersFor(env: Env, has21: boolean) {
@@ -70,43 +97,27 @@ export function downloadUrl(env: Env, token: string) {
 
 /**
  * Record the order (once), make sure it has a download link, and send the email (once).
- * Returns null if the session isn't paid yet.
  */
-export async function fulfil(env: Env, session: CheckoutSession): Promise<Delivery | null> {
-  if (!isPaid(session)) return null;
-  const email = session.customer_details?.email;
-  if (!email) throw new Error(`Session ${session.id} has no customer email`);
-
-  const has21 = boughtUpgrade(session, env.STRIPE_PRICE_UPGRADE);
+export async function fulfil(env: Env, p: Purchase): Promise<Delivery> {
   const inserted = await env.DB.prepare(
-    `INSERT OR IGNORE INTO orders (id, email, name, has_21, amount_total, currency, discount, payment_intent, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT OR IGNORE INTO orders (id, email, name, has_21, amount_total, currency, discount, promo_code, marketing, payment_intent, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   )
-    .bind(
-      session.id,
-      email.toLowerCase(),
-      session.customer_details?.name ?? null,
-      has21 ? 1 : 0,
-      session.amount_total ?? 0,
-      session.currency ?? "aud",
-      session.total_details?.amount_discount ?? 0,
-      session.payment_intent ?? null,
-      new Date().toISOString(),
-    )
+    .bind(p.id, p.email, p.name, p.has21 ? 1 : 0, p.amount, p.currency, p.discount, p.promoCode, p.marketing ? 1 : 0, p.id, new Date().toISOString())
     .run();
 
   // Only the call that created the order creates its first token.
-  let token = inserted.meta.changes === 1 ? await issueDownloadToken(env, session.id) : await latestToken(env, session.id);
-  if (!token) token = await issueDownloadToken(env, session.id);
+  let token = inserted.meta.changes === 1 ? await issueDownloadToken(env, p.id) : await latestToken(env, p.id);
+  if (!token) token = await issueDownloadToken(env, p.id);
 
-  const order = (await env.DB.prepare(`SELECT * FROM orders WHERE id = ?`).bind(session.id).first<OrderRow>())!;
+  const order = (await env.DB.prepare(`SELECT * FROM orders WHERE id = ?`).bind(p.id).first<OrderRow>())!;
   const delivery: Delivery = {
     order,
     downloadUrl: downloadUrl(env, token),
     planners: plannersFor(env, order.has_21 === 1),
   };
 
-  if (!order.emailed_at) {
+  if (!order.emailed_at && !order.refunded_at) {
     // Claim the send so a concurrent call doesn't send a second copy.
     const claimed = await env.DB.prepare(`UPDATE orders SET emailed_at = ? WHERE id = ? AND emailed_at IS NULL`)
       .bind(new Date().toISOString(), order.id)

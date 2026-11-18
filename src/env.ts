@@ -10,6 +10,7 @@ export interface Env {
 
   // Secrets (set with `wrangler pages secret put` or in .dev.vars)
   STRIPE_SECRET_KEY: string;
+  STRIPE_PUBLISHABLE_KEY: string;
   STRIPE_WEBHOOK_SECRET: string;
   STRIPE_PRICE_BUNDLE: string;
   STRIPE_PRICE_UPGRADE: string;
