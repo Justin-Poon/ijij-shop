@@ -65,7 +65,8 @@ export function purchaseFromIntent(pi: PaymentIntent): Purchase | null {
 export function plannersFor(env: Env, has21: boolean) {
   const list = [{ label: "14-day Japan planner (Canva template)", url: env.PLANNER_14_URL }];
   if (has21) list.push({ label: "21-day Japan planner (Canva template)", url: env.PLANNER_21_URL });
-  return list;
+  // Never send a broken link: skip any planner whose URL isn't configured yet.
+  return list.filter((p) => typeof p.url === "string" && /^https:\/\//.test(p.url));
 }
 
 export async function issueDownloadToken(env: Env, orderId: string): Promise<string> {
