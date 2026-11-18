@@ -14,7 +14,7 @@ rm -rf "$STATE"
 
 cleanup() {
   kill "${MOCK_PID:-}" "${DEV_PID:-}" 2>/dev/null || true
-  pkill -f "pages dev --port $PORT" 2>/dev/null || true
+  pkill -f "wrangler dev --port $PORT" 2>/dev/null || true
   pkill -f "socket-addr=entry=localhost:$PORT" 2>/dev/null || true
 }
 trap cleanup EXIT
@@ -25,10 +25,10 @@ npx wrangler d1 migrations apply ijij-shop --local --persist-to "$STATE" >/dev/n
 printf '%%PDF-1.4 fake guide for tests\n' > /tmp/ijij-guide.pdf
 npx wrangler r2 object put ijij-shop-files/japan-the-complete-guide.pdf --file /tmp/ijij-guide.pdf --local --persist-to "$STATE" >/dev/null
 
-npx wrangler pages dev --port $PORT --persist-to "$STATE" \
-  --binding SITE_URL="$SITE" STRIPE_API_BASE="http://127.0.0.1:$MOCK" STRIPE_SECRET_KEY=sk_test_mock STRIPE_PUBLISHABLE_KEY=pk_test_mock \
-  STRIPE_WEBHOOK_SECRET="$WHSEC" STRIPE_PRICE_BUNDLE=price_bundle STRIPE_PRICE_UPGRADE=price_upgrade \
-  PLANNER_14_URL="https://canva.example/14" PLANNER_21_URL="https://canva.example/21" ADMIN_TOKEN="$ADMIN" \
+npx wrangler dev --port $PORT --persist-to "$STATE" \
+  --var SITE_URL:"$SITE" --var STRIPE_API_BASE:"http://127.0.0.1:$MOCK" --var STRIPE_SECRET_KEY:sk_test_mock --var STRIPE_PUBLISHABLE_KEY:pk_test_mock \
+  --var STRIPE_WEBHOOK_SECRET:"$WHSEC" --var STRIPE_PRICE_BUNDLE:price_bundle --var STRIPE_PRICE_UPGRADE:price_upgrade \
+  --var PLANNER_14_URL:"https://canva.example/14" --var PLANNER_21_URL:"https://canva.example/21" --var ADMIN_TOKEN:"$ADMIN" \
   > /tmp/ijij-dev.log 2>&1 & DEV_PID=$!
 
 for i in $(seq 1 60); do curl -sf "$SITE/" >/dev/null && break; sleep 1; done

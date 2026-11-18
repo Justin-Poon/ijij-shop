@@ -1,12 +1,16 @@
-# Cloudflare Pages project for the IJIJ shop.
-# Static pages live in public/, server code in functions/.
+# Cloudflare Worker for the IJIJ shop.
+# Static pages live in public/, server routes in src/worker.ts (handlers in functions/).
 name = "ijij-shop"
+main = "src/worker.ts"
 compatibility_date = "2026-11-01"
-pages_build_output_dir = "public"
+
+[assets]
+directory = "public"
+binding = "ASSETS"
 
 [vars]
 # Public URL of the shop, no trailing slash. Local dev overrides it in .dev.vars.
-SITE_URL = "https://ijij-shop.pages.dev"
+SITE_URL = "https://ijij-shop.contactjustinjapan.workers.dev"
 EMAIL_FROM = "Justin from itsjustinjapan <hello@example.com>"
 # How long a download link works, and how many times.
 DOWNLOAD_DAYS = "60"

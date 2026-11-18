@@ -30,7 +30,8 @@ Product page (/)
 /download/<token>  ──> streams the PDF from R2
 ```
 
-- **Cloudflare Pages** hosts the pages (`public/`) and the server code (`functions/`).
+- **A Cloudflare Worker** serves the pages (`public/`, as static assets) and the server routes (`src/worker.ts`, which calls the handlers in `functions/`). Every push to `main` builds and deploys automatically through Cloudflare's GitHub connection.
+- **Address:** https://ijij-shop.contactjustinjapan.workers.dev until the custom domain is set up.
 - **D1** (Cloudflare's SQLite) stores orders and download links (`migrations/`).
 - **R2** (Cloudflare's file storage) holds the guide PDF privately. Buyers only get it through an expiring link.
 - **Stripe** takes the payment. Card details go straight from Stripe's form to Stripe and never touch this code.
@@ -89,7 +90,6 @@ npx wrangler d1 create ijij-shop            # paste the database_id into wrangle
 npx wrangler r2 bucket create ijij-shop-files
 npm run db:migrate:remote
 npx wrangler r2 object put ijij-shop-files/japan-the-complete-guide.pdf --file <path-to-final-guide.pdf> --remote
-npx wrangler pages project create ijij-shop
 ```
 
 Then, in the Cloudflare dashboard, open Pages → ijij-shop → Settings:
@@ -117,7 +117,7 @@ Add your domain, then add the DNS records it gives you in Cloudflare. Create an 
 cp .dev.vars.example .dev.vars   # fill in Stripe TEST keys
 npm run db:migrate:local
 npx wrangler r2 object put ijij-shop-files/japan-the-complete-guide.pdf --file guide.pdf --local
-npm run dev                       # http://localhost:8788
+npm run dev                       # http://localhost:8787
 stripe listen --forward-to localhost:8788/api/stripe-webhook   # optional, Stripe CLI
 ```
 
