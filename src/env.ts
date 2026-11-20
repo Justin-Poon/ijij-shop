@@ -22,6 +22,7 @@ export interface Env {
   // Bot protection (optional: everything still works without them)
   TURNSTILE_SITE_KEY?: string;
   TURNSTILE_SECRET?: string;
+  TURNSTILE_HOSTNAMES?: string; // comma-separated frontend hostnames the token must come from
   CHECKOUT_LIMITER?: RateLimit;
   TRACK_LIMITER?: RateLimit;
 

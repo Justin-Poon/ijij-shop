@@ -47,6 +47,7 @@
     window.onTurnstileLoad = function () {
       state.turnstileId = window.turnstile.render("#turnstile", {
         sitekey: siteKey,
+        action: "checkout",
         appearance: "interaction-only",
         callback: (t) => (state.turnstile = t),
         "expired-callback": () => (state.turnstile = ""),

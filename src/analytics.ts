@@ -78,20 +78,40 @@ export async function allowed(limiter: RateLimit | undefined, request: Request, 
   return success;
 }
 
-/** Check a Cloudflare Turnstile token. Skipped (allowed) when Turnstile isn't configured. */
+export const TURNSTILE_ACTION = "checkout";
+
+/**
+ * Check a Cloudflare Turnstile token with Siteverify (canonical checks: success, expected action,
+ * and an approved frontend hostname). Skipped when TURNSTILE_SECRET isn't set (local dev).
+ */
 export async function turnstileOk(env: Env, token: unknown, request: Request): Promise<boolean> {
   if (!env.TURNSTILE_SECRET) return true;
-  if (typeof token !== "string" || !token) return false;
-  const body = new FormData();
-  body.append("secret", env.TURNSTILE_SECRET);
-  body.append("response", token);
+  const expectedHostnames = new Set(
+    (env.TURNSTILE_HOSTNAMES ?? "")
+      .split(",")
+      .map((h) => h.trim())
+      .filter(Boolean),
+  );
+  if (typeof token !== "string" || token.length === 0 || token.length > 2048 || expectedHostnames.size === 0) return false;
+
+  const body = new URLSearchParams({ secret: env.TURNSTILE_SECRET, response: token });
   const ip = request.headers.get("CF-Connecting-IP");
-  if (ip) body.append("remoteip", ip);
+  if (ip) body.set("remoteip", ip);
+  let result: { success?: boolean; action?: string; hostname?: string; "error-codes"?: string[] };
   try {
-    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", { method: "POST", body });
-    const data = (await res.json()) as { success?: boolean };
-    return data.success === true;
-  } catch {
+    const r = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      signal: AbortSignal.timeout(10_000),
+      body,
+    });
+    if (!r.ok) throw new Error(`siteverify ${r.status}`);
+    result = await r.json();
+  } catch (err) {
+    console.error("turnstile siteverify failed", err);
     return false;
   }
+  const ok = result.success === true && result.action === TURNSTILE_ACTION && !!result.hostname && expectedHostnames.has(result.hostname);
+  if (!ok) console.warn("turnstile rejected", { action: result.action, hostname: result.hostname, errors: result["error-codes"] });
+  return ok;
 }

@@ -17,7 +17,8 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, waitUntil
     const res = json(
       {
         publishableKey: env.STRIPE_PUBLISHABLE_KEY,
-        turnstileSiteKey: env.TURNSTILE_SITE_KEY || null,
+        // Only show the bot check once the server can verify it (secret set).
+        turnstileSiteKey: env.TURNSTILE_SECRET && env.TURNSTILE_SITE_KEY ? env.TURNSTILE_SITE_KEY : null,
         currency: q.currency,
         bundle: { amount: q.bundle, display: formatMoney(q.bundle, q.currency) },
         upgrade: { amount: q.upgrade, display: formatMoney(q.upgrade, q.currency) },

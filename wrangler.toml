@@ -23,6 +23,10 @@ GUIDE_KEY = "japan-the-complete-guide.pdf"
 # Stripe prices (TEST mode). Swap for the live price IDs at launch.
 STRIPE_PRICE_BUNDLE = "price_1UdEfFAg0KVyXnxV09UoRCXo"
 STRIPE_PRICE_UPGRADE = "price_1UdEfIAg0KVyXnxVQjL62lxe"
+# Cloudflare Turnstile (bot check on Purchase). The site key is public; the secret is the
+# TURNSTILE_SECRET Worker secret. Tokens must come from one of these hostnames (never localhost here).
+TURNSTILE_SITE_KEY = "0x4AAAAAAGK4-1hsupdepr_B"
+TURNSTILE_HOSTNAMES = "ijij-shop.contactjustinjapan.workers.dev,shop.itsjustinjapan.com"
 
 [[d1_databases]]
 binding = "DB"
