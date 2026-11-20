@@ -119,4 +119,25 @@ CODE=$(curl -s -o /dev/null -w '%{http_code}' "$NEW")
 CODE=$(curl -s -o /dev/null -w '%{http_code}' "$SITE/api/order?payment_intent=$PI&payment_intent_client_secret=$SECRET")
 [[ "$CODE" == 410 ]] && pass "refunded order shows as refunded" || fail "refunded order code $CODE"
 
+# 7. Analytics: views and purchases attributed to a source; stats need the admin token
+IG_UA="Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) Mobile/22A3354 Instagram 350.0.0.0.0"
+T=$(curl -s -X POST "$SITE/api/track" -H 'Content-Type: application/json' -H "User-Agent: Mozilla/5.0 Safari" -d '{"source":"tt","visitor":"visitor_tiktok_1"}')
+[[ "$(field "$T" source)" == tiktok ]] && pass "view tagged tiktok from ?src=tt" || fail "track: $T"
+T=$(curl -s -X POST "$SITE/api/track" -H 'Content-Type: application/json' -H "User-Agent: $IG_UA" -d '{"visitor":"visitor_insta_1"}')
+[[ "$(field "$T" source)" == instagram ]] && pass "Instagram in-app browser recognised" || fail "ig track: $T"
+CODE=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$SITE/api/track" -H 'Content-Type: application/json' -H "User-Agent: facebookexternalhit/1.1" -d '{}')
+[[ "$CODE" == 204 ]] && pass "link-preview bots aren't counted" || fail "bot track $CODE"
+I=$(curl -s -X POST "$SITE/api/intent" -H 'Content-Type: application/json' -H "User-Agent: Mozilla/5.0 Safari" -d '{"name":"Tok Buyer","email":"tok@example.com","source":"tiktok","visitor":"visitor_tiktok_1"}')
+SECRET3=$(field "$I" clientSecret); PI3=${SECRET3%%_secret_*}
+curl -sf -X POST "$MOCKURL/__succeed/$PI3" >/dev/null
+curl -sf "$SITE/api/order?payment_intent=$PI3&payment_intent_client_secret=$SECRET3" >/dev/null
+CODE=$(curl -s -o /dev/null -w '%{http_code}' "$SITE/api/admin/stats")
+[[ "$CODE" == 401 ]] && pass "stats need the admin token" || fail "stats auth $CODE"
+S=$(curl -sf "$SITE/api/admin/stats?days=7" -H "Authorization: Bearer $ADMIN")
+TT=$(node -e 'const d=JSON.parse(process.argv[1]);const r=d.sources.find(s=>s.source==="tiktok");console.log([r.visitors,r.checkouts,r.orders,r.revenue,r.conversion].join(","))' "$S")
+[[ "$TT" == "1,1,1,3900,1" ]] && pass "stats: tiktok 1 visitor → 1 checkout → 1 order, 100%" || fail "stats tiktok: $TT / $S"
+IG=$(node -e 'const d=JSON.parse(process.argv[1]);const r=d.sources.find(s=>s.source==="instagram");console.log([r.visitors,r.orders].join(","))' "$S")
+[[ "$IG" == "1,0" ]] && pass "stats: instagram 1 visitor, 0 orders" || fail "stats ig: $IG"
+H=$(curl -sf "$SITE/admin"); [[ "$H" == *"Shop stats"* ]] && pass "stats page loads" || fail "admin page"
+
 echo "All end-to-end checks passed."

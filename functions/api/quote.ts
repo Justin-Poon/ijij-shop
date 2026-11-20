@@ -4,8 +4,10 @@
 import type { Env } from "../../src/env.ts";
 import { quote } from "../../src/pricing.ts";
 import { formatMoney, json } from "../../src/util.ts";
+import { allowed } from "../../src/analytics.ts";
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+  if (!(await allowed(env.TRACK_LIMITER, request, "quote"))) return json({ error: "Too many requests" }, 429);
   const body = (await request.json().catch(() => ({}))) as { upgrade?: boolean; code?: string };
   try {
     const q = await quote(env, { upgrade: !!body.upgrade, code: body.code });

@@ -8,6 +8,8 @@ import { onRequestPost as intent } from "../functions/api/intent.ts";
 import { onRequestGet as order } from "../functions/api/order.ts";
 import { onRequestPost as webhook } from "../functions/api/stripe-webhook.ts";
 import { onRequestPost as resend } from "../functions/api/admin/resend.ts";
+import { onRequestGet as stats } from "../functions/api/admin/stats.ts";
+import { onRequestPost as track } from "../functions/api/track.ts";
 import { onRequestGet as download } from "../functions/download/[token].ts";
 
 type Handler = (ctx: any) => Response | Promise<Response>;
@@ -19,6 +21,8 @@ const ROUTES: [method: string, path: string | RegExp, handler: Handler][] = [
   ["GET", "/api/order", order],
   ["POST", "/api/stripe-webhook", webhook],
   ["POST", "/api/admin/resend", resend],
+  ["GET", "/api/admin/stats", stats],
+  ["POST", "/api/track", track],
   ["GET", /^\/download\/([^/]+)$/, download],
 ];
 

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Shop stats</title>
+<link rel="icon" href="/brand/profile.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --maroon:#6b1234; --blush:#fae2e0; --ink:#111; --body:#2a2426; --muted:#7a6d70; --rule:#ece4e5; --bg:#fff; --card:#fff; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--body); font: 15px/1.5 Inter, system-ui, sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 20px 16px 48px; }
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  header img { width: 40px; height: 40px; }
+  h1 { font-size: 1.35rem; margin: 0; color: var(--ink); }
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 18px; }
+  .controls button { border: 1px solid var(--rule); background: #fff; border-radius: 999px; padding: 7px 14px; font: 600 .9rem Inter; cursor: pointer; color: var(--body); }
+  .controls button.on { background: var(--maroon); border-color: var(--maroon); color: #fff; }
+  .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 22px; }
+  @media (min-width: 720px) { .tiles { grid-template-columns: repeat(5, 1fr); } }
+  .tile { border: 1px solid var(--rule); border-radius: 12px; padding: 12px 14px; }
+  .tile .k { font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+  .tile .v { font-size: 1.5rem; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; font-variant-numeric: tabular-nums; }
+  th, td { padding: 10px 12px; text-align: right; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; background: #fcf8f8; }
+  tr.total td { font-weight: 700; border-bottom: 0; }
+  .bar { display: inline-block; height: 8px; border-radius: 4px; background: var(--maroon); vertical-align: middle; margin-left: 8px; }
+  .chart { display: flex; align-items: flex-end; gap: 3px; height: 90px; margin: 8px 0 4px; }
+  .chart div { flex: 1; background: var(--blush); border-top: 2px solid var(--maroon); min-height: 2px; }
+  .muted { color: var(--muted); font-size: .9rem; }
+  form.login { max-width: 360px; margin-top: 40px; display: grid; gap: 10px; }
+  form.login input { padding: 12px; border: 1px solid var(--rule); border-radius: 8px; font: 15px Inter; }
+  form.login button { padding: 12px; border: 0; border-radius: 8px; background: var(--maroon); color: #fff; font: 600 15px Inter; cursor: pointer; }
+  .err { color: #b3261e; }
+</style>
+</head>
+<body>
+<main>
+  <header><img src="/brand/profile.svg" alt=""><h1>Shop stats</h1></header>
+
+  <form class="login" id="login" hidden>
+    <label for="pw">Admin password</label>
+    <input id="pw" type="password" autocomplete="current-password" required>
+    <button type="submit">Show stats</button>
+    <p class="err" id="login-err"></p>
+  </form>
+
+  <section id="stats" hidden>
+    <div class="controls" id="ranges">
+      <button data-days="1">Today</button><button data-days="7">7 days</button><button data-days="30" class="on">30 days</button><button data-days="90">90 days</button>
+    </div>
+    <div class="tiles" id="tiles"></div>
+    <h2 style="font-size:1.05rem;margin:0 0 8px">By source</h2>
+    <div class="wrap"><table>
+      <thead><tr><th>Source</th><th>Visitors</th><th>Started checkout</th><th>Orders</th><th>Conversion</th><th>Revenue</th><th>Took 21-day</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+    <h2 style="font-size:1.05rem;margin:22px 0 0">Visitors per day</h2>
+    <div class="chart" id="chart"></div>
+    <p class="muted" id="chart-range"></p>
+    <p class="muted">Conversion = orders ÷ unique visitors from that source. Refunded orders are excluded. Add <code>?src=tiktok</code> or <code>?src=ig</code> to your bio links for the cleanest split; visits from the TikTok and Instagram apps are recognised automatically too.</p>
+    <p><button id="logout" style="border:0;background:none;color:var(--maroon);font:600 .9rem Inter;cursor:pointer;padding:0">Log out</button></p>
+  </section>
+</main>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const store = { get: () => { try { return sessionStorage.getItem("ijij-admin") || ""; } catch { return ""; } },
+                  set: (v) => { try { sessionStorage.setItem("ijij-admin", v); } catch {} },
+                  clear: () => { try { sessionStorage.removeItem("ijij-admin"); } catch {} } };
+  const money = (c) => new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format((c || 0) / 100);
+  const pct = (x) => (x == null ? "–" : (x * 100).toFixed(1) + "%");
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  const label = (s) => ({ tiktok: "TikTok", instagram: "Instagram", direct: "Direct / unknown", unknown: "Before tracking", facebook: "Facebook", youtube: "YouTube", search: "Search", email: "Email" })[s] || s.replace(/^other:/, "");
+  let days = 30;
+
+  async function load() {
+    const token = store.get();
+    if (!token) return showLogin();
+    const r = await fetch(`/api/admin/stats?days=${days}`, { headers: { Authorization: `Bearer ${token}` } });
+    if (r.status === 401) { store.clear(); return showLogin("That password didn't work."); }
+    if (!r.ok) { $("rows").innerHTML = `<tr><td colspan="7" class="err">Couldn't load stats (${r.status}).</td></tr>`; return; }
+    const d = await r.json();
+    $("login").hidden = true; $("stats").hidden = false;
+    const t = d.total;
+    $("tiles").innerHTML = [["Visitors", t.visitors], ["Checkouts", t.checkouts], ["Orders", t.orders], ["Conversion", pct(t.conversion)], ["Revenue", money(t.revenue)]]
+      .map(([k, v]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+    const maxRate = Math.max(0.0001, ...d.sources.map((s) => s.conversion || 0));
+    $("rows").innerHTML = d.sources.map((s) => `<tr>
+        <td>${esc(label(s.source))}</td><td>${s.visitors}</td><td>${s.checkouts}</td><td>${s.orders}</td>
+        <td>${pct(s.conversion)}${s.conversion ? `<span class="bar" style="width:${Math.round(60 * s.conversion / maxRate)}px"></span>` : ""}</td>
+        <td>${money(s.revenue)}</td><td>${pct(s.upgradeRate)}</td></tr>`).join("") +
+      `<tr class="total"><td>Total</td><td>${t.visitors}</td><td>${t.checkouts}</td><td>${t.orders}</td><td>${pct(t.conversion)}</td><td>${money(t.revenue)}</td><td>${pct(t.upgradeRate)}</td></tr>`;
+    const max = Math.max(1, ...d.daily.map((x) => x.visitors));
+    $("chart").innerHTML = d.daily.map((x) => `<div title="${x.day}: ${x.visitors}" style="height:${Math.round((x.visitors / max) * 100)}%"></div>`).join("");
+    $("chart-range").textContent = d.daily.length ? `${d.daily[0].day} to ${d.daily[d.daily.length - 1].day}` : "No visits yet.";
+  }
+  function showLogin(msg) { $("stats").hidden = true; $("login").hidden = false; $("login-err").textContent = msg || ""; $("pw").focus(); }
+  $("login").addEventListener("submit", (e) => { e.preventDefault(); store.set($("pw").value.trim()); load(); });
+  $("logout").addEventListener("click", () => { store.clear(); showLogin(); });
+  $("ranges").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    days = Number(b.dataset.days);
+    document.querySelectorAll("#ranges button").forEach((x) => x.classList.toggle("on", x === b));
+    load();
+  });
+  load();
+})();
+</script>
+</body>
+</html>

@@ -19,6 +19,12 @@ export interface Env {
   RESEND_API_KEY?: string;
   ADMIN_TOKEN?: string;
 
+  // Bot protection (optional: everything still works without them)
+  TURNSTILE_SITE_KEY?: string;
+  TURNSTILE_SECRET?: string;
+  CHECKOUT_LIMITER?: RateLimit;
+  TRACK_LIMITER?: RateLimit;
+
   // Testing only: point Stripe calls at a mock server.
   STRIPE_API_BASE?: string;
 }

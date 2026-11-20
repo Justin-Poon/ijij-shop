@@ -59,6 +59,20 @@ Prices live in Stripe, not in code. To change one, add a new Price in the Stripe
 
 A refund in Stripe automatically turns off that order's download links.
 
+## Analytics
+
+Open `/admin` and enter the admin password (`ADMIN_TOKEN`). It shows unique visitors, checkouts started, orders, conversion rate and revenue for each traffic source, for today, 7, 30 or 90 days.
+
+- **How the source is decided:** a `?src=` (or `utm_source`) on the link wins. Otherwise the TikTok and Instagram in-app browsers are recognised automatically. Otherwise the referring site is used, or "direct".
+- **Clean bio links:** use `?src=tiktok` and `?src=ig`. Add `&c=reel-name` to compare individual posts (it's stored as the campaign).
+- **Attribution window:** the first source is remembered in the visitor's browser for 30 days, so someone who visits from TikTok and buys a few days later still counts for TikTok.
+- **What's stored:** no cookies and no personal data. Each visit is a row with the day, the source and a random visitor id (`events` table). Orders also record their source.
+
+## Bot protection
+
+- **Rate limits:** per IP, 6 payment attempts a minute, and 60 page-view or price checks a minute (`[[ratelimits]]` in `wrangler.toml`).
+- **Cloudflare Turnstile:** an invisible human check on Purchase. It turns on when the `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET` secrets are set.
+
 ## Editing the page
 
 - **Copy:** `public/index.html`. The description is a first draft in Justin's voice. Check it against the style guide.

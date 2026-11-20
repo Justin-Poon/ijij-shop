@@ -17,6 +17,9 @@ export interface OrderRow {
   discount: number;
   promo_code: string | null;
   marketing: number;
+  source: string | null;
+  visitor: string | null;
+  campaign: string | null;
   payment_intent: string | null;
   created_at: string;
   emailed_at: string | null;
@@ -40,6 +43,9 @@ export interface Purchase {
   discount: number;
   promoCode: string | null;
   marketing: boolean;
+  source: string | null;
+  visitor: string | null;
+  campaign: string | null;
 }
 
 /** Null if the payment hasn't succeeded (yet) or isn't one of ours. */
@@ -59,6 +65,9 @@ export function purchaseFromIntent(pi: PaymentIntent): Purchase | null {
     discount: Number(m.discount || 0),
     promoCode: m.promo_code || null,
     marketing: m.marketing === "1",
+    source: m.source || null,
+    visitor: m.visitor || null,
+    campaign: m.campaign || null,
   };
 }
 
@@ -101,10 +110,10 @@ export function downloadUrl(env: Env, token: string) {
  */
 export async function fulfil(env: Env, p: Purchase): Promise<Delivery> {
   const inserted = await env.DB.prepare(
-    `INSERT OR IGNORE INTO orders (id, email, name, has_21, amount_total, currency, discount, promo_code, marketing, payment_intent, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT OR IGNORE INTO orders (id, email, name, has_21, amount_total, currency, discount, promo_code, marketing, source, visitor, campaign, payment_intent, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   )
-    .bind(p.id, p.email, p.name, p.has21 ? 1 : 0, p.amount, p.currency, p.discount, p.promoCode, p.marketing ? 1 : 0, p.id, new Date().toISOString())
+    .bind(p.id, p.email, p.name, p.has21 ? 1 : 0, p.amount, p.currency, p.discount, p.promoCode, p.marketing ? 1 : 0, p.source, p.visitor, p.campaign, p.id, new Date().toISOString())
     .run();
 
   // Only the call that created the order creates its first token.

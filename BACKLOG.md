@@ -7,11 +7,14 @@
 - [x] `ADMIN_TOKEN` secret, for the resend tool
 - [ ] Upload the final guide PDF to the R2 bucket `ijij-shop-files` as `japan-the-complete-guide.pdf`
 - [ ] Resend account + `RESEND_API_KEY`; set `EMAIL_FROM` to a real address on your domain
-- [ ] Bot protection: Cloudflare Turnstile on Purchase, plus a rate limit on `/api/intent`
-- [ ] Billing alert in Cloudflare (Billing → Notifications)
+- [x] Rate limits on checkout, quotes and tracking (built in)
+- [ ] Turnstile widget: create it in Cloudflare (Turnstile → Add widget, hostname `ijij-shop.contactjustinjapan.workers.dev` + later `shop.<domain>`, mode Managed). Add the site key as `TURNSTILE_SITE_KEY` and the secret key as `TURNSTILE_SECRET` (both Worker secrets)
+- [x] Analytics: visits, checkouts and orders by source at `/admin` (password = ADMIN_TOKEN)
+- [ ] Use `?src=tiktok` and `?src=ig` on the bio links (e.g. `…/?src=tiktok`)
+- [x] Billing alert in Cloudflare (Billing → Notifications)
 - [x] Test purchase on a phone: payment, webhook and order record all work (18 Nov)
 - [ ] Re-test once the PDF, planner links and email are in: email arrives, download works, refund turns the link off
-- [ ] Decide which payment methods to offer: Stripe currently shows card, Link, Klarna and Zip (Stripe Dashboard → Settings → Payment methods)
+- [x] Decide which payment methods to offer: Stripe currently shows card, Link, Klarna and Zip (Stripe Dashboard → Settings → Payment methods)
 - [ ] Go live: Stripe live products/prices/JAPLAN10/webhook, live keys, custom domain `shop.<your-domain>`
 
 ## Later

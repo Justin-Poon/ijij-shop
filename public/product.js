@@ -4,7 +4,59 @@
   const $ = (id) => document.getElementById(id);
   const form = $("checkout");
   const btn = $("purchase");
-  const state = { upgrade: false, code: "", total: null, currency: "aud", stripe: null, elements: null, busy: false };
+  const state = { upgrade: false, code: "", total: null, currency: "aud", stripe: null, elements: null, busy: false, turnstile: "", turnstileId: null };
+
+  // ---- Attribution -------------------------------------------------------------------
+  // Remember where this visitor first came from (TikTok, Instagram...) for 30 days, so a
+  // purchase made on a later visit still counts for the right source. Stored only in this browser.
+  const attribution = (function () {
+    const qs = new URLSearchParams(location.search);
+    const fresh = {
+      source: qs.get("src") || qs.get("utm_source") || "",
+      campaign: qs.get("c") || qs.get("utm_campaign") || "",
+      referrer: document.referrer && !document.referrer.startsWith(location.origin) ? document.referrer : "",
+    };
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem("ijij-attr") || "null"); } catch {}
+    const visitor = (saved && saved.visitor) || (crypto.randomUUID ? crypto.randomUUID().replace(/-/g, "") : String(Math.random()).slice(2) + Date.now());
+    const expired = !saved || Date.now() - (saved.at || 0) > 30 * 86400000;
+    const a = !expired && !fresh.source ? saved : { ...fresh, visitor, at: Date.now() };
+    a.visitor = visitor;
+    try { localStorage.setItem("ijij-attr", JSON.stringify(a)); } catch {}
+    return a;
+  })();
+  fetch("/api/track", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ source: attribution.source, campaign: attribution.campaign, referrer: attribution.referrer, visitor: attribution.visitor }),
+    keepalive: true,
+  })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => {
+      // Lock in what the server worked out (e.g. "tiktok" from the in-app browser) for later visits.
+      if (d && d.source && !attribution.source) {
+        attribution.source = d.source;
+        try { localStorage.setItem("ijij-attr", JSON.stringify(attribution)); } catch {}
+      }
+    })
+    .catch(() => {});
+
+  // ---- Bot check (Cloudflare Turnstile) ----------------------------------------------
+  function mountTurnstile(siteKey) {
+    if (!siteKey) return;
+    window.onTurnstileLoad = function () {
+      state.turnstileId = window.turnstile.render("#turnstile", {
+        sitekey: siteKey,
+        appearance: "interaction-only",
+        callback: (t) => (state.turnstile = t),
+        "expired-callback": () => (state.turnstile = ""),
+      });
+    };
+    const sc = document.createElement("script");
+    sc.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad&render=explicit";
+    sc.async = true;
+    document.head.appendChild(sc);
+  }
 
   const setPrice = (key, text) => document.querySelectorAll(`[data-price="${key}"]`).forEach((el) => (el.textContent = text));
   const payError = (msg) => ($("pay-error").textContent = msg || "");
@@ -103,9 +155,14 @@
       const r = await fetch("/api/intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, marketing: $("marketing").checked, upgrade: state.upgrade, code: state.code }),
+        body: JSON.stringify({
+          name, email, marketing: $("marketing").checked, upgrade: state.upgrade, code: state.code,
+          source: attribution.source, campaign: attribution.campaign, visitor: attribution.visitor, turnstile: state.turnstile,
+        }),
       });
       const d = await r.json();
+      // Each bot-check token works once: get a fresh one ready for any retry.
+      if (window.turnstile && state.turnstileId !== null) { window.turnstile.reset(state.turnstileId); state.turnstile = ""; }
       if (!r.ok) throw new Error(d.error || "Something went wrong.");
 
       const { error } = await state.stripe.confirmPayment({
@@ -168,6 +225,7 @@
     .then(async (cfg) => {
       setPrice("bundle", cfg.bundle.display);
       setPrice("upgrade", cfg.upgrade.display);
+      mountTurnstile(cfg.turnstileSiteKey);
       state.total = cfg.bundle.amount;
       $("total").textContent = cfg.bundle.display;
       const start = () => mountStripe(cfg);
