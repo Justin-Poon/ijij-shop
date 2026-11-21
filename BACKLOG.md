@@ -28,10 +28,10 @@
 
 ## Guide fixes for the next export (from the 21 Nov review)
 - [ ] Typo, page 14 (Staying connected): "Free wifi does exists" → "does exist"
+- [ ] Welcome (p4): "now that i've finished it" and "like i'd write" → capital I; "hard earned" → "hard-earned"
 - [ ] Spill-over pages that hold only a line or a lone tip: 7, 11, 47, 56, 66, 73, 81, 91, 94, 101. Tighten so each section ends on its own page
-- [ ] "Know someone going to Japan?" (page 99): add where to buy, `shop.itsjustinjapan.com`, next to the JAPLAN10 code
-- [ ] Back cover: swap the Gmail address for `hello@itsjustinjapan.com`; consider the round profile logo instead of the arch badge, to match the cover
-- [ ] Photo credits: drop Tomáš Malík (old cover); add **zhgn_ on Unsplash** (new cover)
+- [x] Patched into the live PDF (21 Nov), but make the same changes in the guide builder so the next export keeps them: share page (p99) says "Send them to shop.itsjustinjapan.com"; Welcome (p4) and back cover use hello@itsjustinjapan.com; credits name zhgn_ for the cover
+- [ ] Back cover: consider the round profile logo instead of the arch badge, to match the cover
 - [ ] Daikanyama T-Site photo (Jonathan Lin, Wikimedia Commons): add its licence, e.g. "CC BY-SA 4.0", to the credit, as Creative Commons requires
 - [ ] Contents page numbers: re-check after the layout tightening
 
