@@ -5,9 +5,9 @@
 - [x] Stripe test keys as Worker secrets: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`
 - [x] Stripe webhook → `/api/stripe-webhook` (events `payment_intent.succeeded`, `charge.refunded`), secret as `STRIPE_WEBHOOK_SECRET`
 - [x] `ADMIN_TOKEN` secret, for the resend tool
-- [ ] Upload the guide PDF to the R2 bucket `ijij-shop-files`. For launch: the 10 Nov export (OneDrive `guide-builder/exports/ijij-japan-guide-final-20261110-0656.pdf`), which Claude then gives the new cover and shrinks
-- [ ] Resend: add domain `itsjustinjapan.com` (region Tokyo), verify DNS, create a sending key, save as Worker secret `RESEND_API_KEY` (sender `hello@itsjustinjapan.com` is already set)
-- [ ] Cloudflare Email Routing: forward `hello@itsjustinjapan.com` to your inbox so customer replies reach you
+- [x] Guide PDF in R2 as `japan-the-complete-guide.pdf`: the 10 Nov export with the new cover, photos recompressed to 1400 px (79 MB → 20 MB). The original is kept in the bucket (21 Nov)
+- [x] Resend: add domain `itsjustinjapan.com` (region Tokyo), verify DNS, create a sending key, save as Worker secret `RESEND_API_KEY` (sender `hello@itsjustinjapan.com` is already set)
+- [x] Replies: hello@itsjustinjapan.com is a Namecheap Private Email mailbox (read in the Private Email app); Namecheap forwarding DNS removed
 - [ ] 21-day upgrade: get its Canva template link, or hide the upgrade at launch
 - [x] Rate limits on checkout, quotes and tracking (built in)
 - [ ] Turnstile widget: create it in Cloudflare (Turnstile → Add widget, hostname `ijij-shop.contactjustinjapan.workers.dev` + later `shop.<domain>`, mode Managed). Add the site key as `TURNSTILE_SITE_KEY` and the secret key as `TURNSTILE_SECRET` (both Worker secrets)
@@ -27,6 +27,8 @@
 - [ ] **After the two-week break:** re-export the guide from the "fun" version (v2-fun, 14 Nov) with the new cover and smaller photos, then replace the PDF in R2. Needs `git push origin --all` from the PC first.
 
 ## Later
+- [ ] `www.itsjustinjapan.com` points to a Namecheap parking page: add www as a custom domain on the `itsjustinjapan` Pages project
+- [ ] Add a DMARC record (`_dmarc`) and Private Email's DKIM record if not done
 - [ ] Real customer reviews in `public/reviews.json` (e.g. Etsy reviews)
 - [ ] Follow-up email sequence and buyers added to the email list
 - [ ] Post-purchase upsell (things to do and eat guide)
