@@ -190,3 +190,15 @@ header.top a { color: var(--ink); text-decoration: none; }
 .btn.ghost { background: #fff; color: var(--maroon); border: 2px solid var(--maroon); }
 .spinner { width: 28px; height: 28px; border-radius: 50%; border: 3px solid var(--rule); border-top-color: var(--maroon); animation: spin 1s linear infinite; margin: 20px 0; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* FAQ */
+.faq h2 { text-align: center; font-size: 1.55rem; font-weight: 700; color: var(--ink); margin: 0 0 14px; }
+.faq details { border-bottom: 1px solid var(--rule); }
+.faq details:first-of-type { border-top: 1px solid var(--rule); }
+.faq summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 2px; font-weight: 600; color: var(--ink); }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; flex: none; font-size: 1.3rem; line-height: 1; color: var(--maroon); transition: transform .15s; }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq summary:focus-visible { outline: 2px solid var(--maroon); outline-offset: 2px; border-radius: 4px; }
+.faq details p { margin: 0 2px 12px; color: var(--body); }
+.faq details p:last-child { margin-bottom: 16px; }
