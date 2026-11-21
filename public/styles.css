@@ -155,8 +155,8 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: 24px 0; }
 .line.total span:last-child { color: var(--maroon); }
 
 .payment { min-height: 60px; margin: 0 0 12px; }
-.turnstile { display: flex; justify-content: center; margin: 0 0 10px; }
-.turnstile:empty { margin: 0; }
+.turnstile { display: flex; justify-content: center; height: 0; overflow: hidden; }
+.turnstile.show { height: auto; overflow: visible; margin: 0 0 10px; }
 .pay-error { color: var(--bad); font-size: .92rem; min-height: 1.2em; margin: 0 0 10px; }
 
 .purchase {
@@ -170,6 +170,8 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: 24px 0; }
 .secure { display: flex; justify-content: center; align-items: center; gap: 6px; font-size: .82rem; color: var(--muted); margin: 12px 0 0; }
 
 footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 40px 16px 48px; }
+footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; margin-bottom: 10px; }
+footer a { color: var(--muted); }
 
 /* ---- Thank-you and message pages ------------------------------------------------------ */
 .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }

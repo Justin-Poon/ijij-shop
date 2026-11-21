@@ -1,7 +1,7 @@
 // GET /api/config -> prices and the Stripe publishable key for the product page.
 
 import type { Env } from "../../src/env.ts";
-import { quote } from "../../src/pricing.ts";
+import { quote, upgradeAvailable } from "../../src/pricing.ts";
 import { formatMoney, json } from "../../src/util.ts";
 import { StripeError } from "../../src/stripe.ts";
 
@@ -21,7 +21,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, waitUntil
         turnstileSiteKey: env.TURNSTILE_SECRET && env.TURNSTILE_SITE_KEY ? env.TURNSTILE_SITE_KEY : null,
         currency: q.currency,
         bundle: { amount: q.bundle, display: formatMoney(q.bundle, q.currency) },
-        upgrade: { amount: q.upgrade, display: formatMoney(q.upgrade, q.currency) },
+        upgrade: { amount: q.upgrade, display: formatMoney(q.upgrade, q.currency), available: upgradeAvailable(env) },
       },
       200,
       { "Cache-Control": "public, max-age=300" },

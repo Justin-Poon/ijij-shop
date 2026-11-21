@@ -26,6 +26,15 @@
   - [ ] **REMINDER: update the TikTok and Instagram bio links** to `https://shop.itsjustinjapan.com/?src=tiktok` and `https://shop.itsjustinjapan.com/?src=ig`
 - [ ] **After the two-week break:** re-export the guide from the "fun" version (v2-fun, 14 Nov) with the new cover and smaller photos, then replace the PDF in R2. Needs `git push origin --all` from the PC first.
 
+## Guide fixes for the next export (from the 21 Nov review)
+- [ ] Typo, page 14 (Staying connected): "Free wifi does exists" → "does exist"
+- [ ] Spill-over pages that hold only a line or a lone tip: 7, 11, 47, 56, 66, 73, 81, 91, 94, 101. Tighten so each section ends on its own page
+- [ ] "Know someone going to Japan?" (page 99): add where to buy, `shop.itsjustinjapan.com`, next to the JAPLAN10 code
+- [ ] Back cover: swap the Gmail address for `hello@itsjustinjapan.com`; consider the round profile logo instead of the arch badge, to match the cover
+- [ ] Photo credits: drop Tomáš Malík (old cover); add **zhgn_ on Unsplash** (new cover)
+- [ ] Daikanyama T-Site photo (Jonathan Lin, Wikimedia Commons): add its licence, e.g. "CC BY-SA 4.0", to the credit, as Creative Commons requires
+- [ ] Contents page numbers: re-check after the layout tightening
+
 ## Later
 - [ ] `www.itsjustinjapan.com` points to a Namecheap parking page: add www as a custom domain on the `itsjustinjapan` Pages project
 - [ ] Add a DMARC record (`_dmarc`) and Private Email's DKIM record if not done

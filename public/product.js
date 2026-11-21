@@ -50,6 +50,10 @@
         action: "checkout",
         appearance: "interaction-only",
         callback: (t) => (state.turnstile = t),
+        // Invisible for most people: only open up space if Cloudflare needs the visitor to click.
+        "before-interactive-callback": () => $("turnstile").classList.add("show"),
+        "after-interactive-callback": () => $("turnstile").classList.remove("show"),
+        "error-callback": () => { $("turnstile").classList.add("show"); },
         "expired-callback": () => (state.turnstile = ""),
       });
     };
@@ -226,6 +230,11 @@
     .then(async (cfg) => {
       setPrice("bundle", cfg.bundle.display);
       setPrice("upgrade", cfg.upgrade.display);
+      if (cfg.upgrade.available === false) {
+        document.querySelector(".bump").hidden = true;
+        $("upgrade").checked = false;
+        state.upgrade = false;
+      }
       mountTurnstile(cfg.turnstileSiteKey);
       state.total = cfg.bundle.amount;
       $("total").textContent = cfg.bundle.display;

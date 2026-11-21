@@ -45,7 +45,7 @@ field() { node -e 'const o=JSON.parse(process.argv[1]); console.log(process.argv
 sign() { node --experimental-strip-types --no-warnings -e "import('./src/stripe.ts').then(async m=>console.log(await m.signPayload('$WHSEC', process.argv[1])))" "$1"; }
 
 C=$(curl -sf "$SITE/api/config")
-[[ "$(field "$C" bundle.display)" == '$39.00' && "$(field "$C" upgrade.display)" == '$10.00' && "$(field "$C" publishableKey)" == pk_test_mock ]] && pass "config: prices + publishable key" || fail "config: $C"
+[[ "$(field "$C" bundle.display)" == "A\$39" && "$(field "$C" upgrade.display)" == "A\$10" && "$(field "$C" publishableKey)" == pk_test_mock ]] && pass "config: prices + publishable key" || fail "config: $C"
 
 # Quotes and discount codes
 Q=$(post /api/quote '{"upgrade":false}');               [[ "$(field "$Q" total)" == 3900 ]] && pass "quote: bundle = 3900" || fail "quote $Q"
@@ -139,5 +139,7 @@ TT=$(node -e 'const d=JSON.parse(process.argv[1]);const r=d.sources.find(s=>s.so
 IG=$(node -e 'const d=JSON.parse(process.argv[1]);const r=d.sources.find(s=>s.source==="instagram");console.log([r.visitors,r.orders].join(","))' "$S")
 [[ "$IG" == "1,0" ]] && pass "stats: instagram 1 visitor, 0 orders" || fail "stats ig: $IG"
 H=$(curl -sf "$SITE/admin"); [[ "$H" == *"Shop stats"* ]] && pass "stats page loads" || fail "admin page"
+H=$(curl -sf "$SITE/policies"); [[ "$H" == *"Refunds"* && "$H" == *"Australian Consumer Law"* ]] && pass "policies page loads" || fail "policies page"
+[[ "$(field "$C" upgrade.available)" == true ]] && pass "upgrade offered when the 21-day link is set" || fail "upgrade availability: $C"
 
 echo "All end-to-end checks passed."

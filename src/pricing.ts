@@ -39,11 +39,16 @@ export function applyPromotion(subtotal: number, currency: string, promo: Promot
   return { discount, error: null };
 }
 
+/** The 21-day upgrade is only sold once its planner link is configured. */
+export function upgradeAvailable(env: Env): boolean {
+  return typeof env.PLANNER_21_URL === "string" && /^https:\/\//.test(env.PLANNER_21_URL);
+}
+
 export async function quote(env: Env, opts: { upgrade: boolean; code?: string | null }): Promise<Quote> {
   const [bundlePrice, upgradePrice] = await Promise.all([getPrice(env, env.STRIPE_PRICE_BUNDLE), getPrice(env, env.STRIPE_PRICE_UPGRADE)]);
   const currency = bundlePrice.currency;
   const bundle = bundlePrice.unit_amount ?? 0;
-  const upgrade = opts.upgrade ? (upgradePrice.unit_amount ?? 0) : 0;
+  const upgrade = opts.upgrade && upgradeAvailable(env) ? (upgradePrice.unit_amount ?? 0) : 0;
   const subtotal = bundle + upgrade;
 
   const typed = opts.code?.trim();

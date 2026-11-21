@@ -16,5 +16,12 @@ export function escapeHtml(s: string): string {
 }
 
 export function formatMoney(amount: number, currency: string): string {
-  return new Intl.NumberFormat("en-AU", { style: "currency", currency: currency.toUpperCase() }).format(amount / 100);
+  // en-US shows AUD as "A$", so overseas buyers don't read it as US dollars. Whole amounts drop the ".00".
+  const whole = amount % 100 === 0;
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+    minimumFractionDigits: whole ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(amount / 100);
 }
