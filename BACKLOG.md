@@ -1,5 +1,11 @@
 # Backlog
 
+## Go-live (waiting on Stripe phone verification, back from overseas)
+Live Stripe is ready: products, JAPLAN10, and a webhook to shop.itsjustinjapan.com (`we_1Ue7BQAg0KVyXnxVL1OMBtNn`, live). To flip:
+1. In `wrangler.toml`, set `STRIPE_PRICE_BUNDLE = price_1Ue7BLAg0KVyXnxVwam5LddQ` and `STRIPE_PRICE_UPGRADE = price_1Ue7BNAg0KVyXnxVD6ZKYesn`
+2. Worker secrets: `STRIPE_PUBLISHABLE_KEY` = pk_live, `STRIPE_SECRET_KEY` = sk_live, `STRIPE_WEBHOOK_SECRET` = the live webhook's signing secret (Stripe → Developers → Webhooks)
+3. Clear the test orders and events from D1, do one real purchase and refund it, then update the bio links
+
 ## Before launch
 - [x] 14-day template link checked and saved (21 Nov). 21-day link still needed. Original note: **Planner template links.** Check `canva.link/yfzhz27fc56f3ft` opens as a *template* ("Use template"), not the live 14-day design. Get the 21-day planner's template link (Canva: Share → More → Template link). Add both as Worker secrets `PLANNER_14_URL` and `PLANNER_21_URL`.
 - [x] Stripe test keys as Worker secrets: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`
