@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Shop stats</title>
+<title>Shop admin</title>
 <link rel="icon" href="/brand/profile.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,6 +39,16 @@
   form.login input { padding: 12px; border: 1px solid var(--rule); border-radius: 8px; font: 15px Inter; }
   form.login button { padding: 12px; border: 0; border-radius: 8px; background: var(--maroon); color: #fff; font: 600 15px Inter; cursor: pointer; }
   .err { color: #b3261e; }
+  .rv { border: 1px solid var(--rule); border-radius: 12px; padding: 14px; margin: 0 0 10px; }
+  .rv .meta { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; font-size: .85rem; color: var(--muted); margin-bottom: 6px; }
+  .rv .meta b { color: var(--ink); font-size: .95rem; }
+  .rv .st { color: var(--maroon); letter-spacing: 1px; }
+  .rv p { margin: 0 0 10px; white-space: pre-wrap; }
+  .tag { display: inline-block; border-radius: 999px; padding: 1px 8px; font-size: .75rem; font-weight: 600; background: var(--blush); color: var(--maroon); }
+  .tag.warn { background: #fdecea; color: #b3261e; }
+  .rv .act { display: flex; gap: 8px; }
+  .rv .act button { border: 1px solid var(--rule); background: #fff; border-radius: 999px; padding: 6px 14px; font: 600 .85rem Inter; cursor: pointer; color: var(--body); }
+  .rv .act button.yes { background: var(--maroon); border-color: var(--maroon); color: #fff; }
 </style>
 </head>
 <body>
@@ -66,6 +76,12 @@
     <div class="chart" id="chart"></div>
     <p class="muted" id="chart-range"></p>
     <p class="muted">Conversion = orders ÷ unique visitors from that source. Refunded orders are excluded. Add <code>?src=tiktok</code> or <code>?src=ig</code> to your bio links for the cleanest split; visits from the TikTok and Instagram apps are recognised automatically too.</p>
+    <h2 style="font-size:1.05rem;margin:28px 0 8px">Reviews</h2>
+    <p class="muted" style="margin-top:0">Customers leave these at <a href="/review">/review</a>. Nothing shows on the shop until you approve it, and only if they ticked "OK to show".</p>
+    <div class="controls" id="rv-tabs">
+      <button data-s="pending" class="on">Waiting</button><button data-s="approved">On the shop</button><button data-s="hidden">Hidden</button>
+    </div>
+    <div id="rv-list"></div>
     <p><button id="logout" style="border:0;background:none;color:var(--maroon);font:600 .9rem Inter;cursor:pointer;padding:0">Log out</button></p>
   </section>
 </main>
@@ -101,6 +117,7 @@
     const max = Math.max(1, ...d.daily.map((x) => x.visitors));
     $("chart").innerHTML = d.daily.map((x) => `<div title="${x.day}: ${x.visitors}" style="height:${Math.round((x.visitors / max) * 100)}%"></div>`).join("");
     $("chart-range").textContent = d.daily.length ? `${d.daily[0].day} to ${d.daily[d.daily.length - 1].day}` : "No visits yet.";
+    loadReviews();
   }
   function showLogin(msg) { $("stats").hidden = true; $("login").hidden = false; $("login-err").textContent = msg || ""; $("pw").focus(); }
   $("login").addEventListener("submit", (e) => { e.preventDefault(); store.set($("pw").value.trim()); load(); });
@@ -110,6 +127,45 @@
     days = Number(b.dataset.days);
     document.querySelectorAll("#ranges button").forEach((x) => x.classList.toggle("on", x === b));
     load();
+  });
+  // ---- Reviews ----
+  let rvStatus = "pending";
+  const stars = (n) => "★".repeat(n) + "☆".repeat(5 - n);
+  async function loadReviews() {
+    const token = store.get();
+    const r = await fetch(`/api/admin/reviews?status=${rvStatus}`, { headers: { Authorization: `Bearer ${token}` } });
+    if (!r.ok) { $("rv-list").innerHTML = `<p class="err">Couldn't load reviews (${r.status}).</p>`; return; }
+    const d = await r.json();
+    const c = d.counts || {};
+    document.querySelectorAll("#rv-tabs button").forEach((b) => {
+      const n = c[b.dataset.s] || 0;
+      b.textContent = { pending: "Waiting", approved: "On the shop", hidden: "Hidden" }[b.dataset.s] + (n ? ` (${n})` : "");
+    });
+    if (!d.reviews.length) { $("rv-list").innerHTML = `<p class="muted">Nothing here.</p>`; return; }
+    $("rv-list").innerHTML = d.reviews.map((v) => `<div class="rv">
+        <div class="meta"><b>${esc(v.name)}</b><span class="st">${stars(v.stars)}</span><span>${esc(v.created_at.slice(0, 10))}</span>
+          ${v.verified ? `<span class="tag">Verified buyer</span>` : `<span class="tag warn">No matching order</span>`}
+          ${v.consent ? "" : `<span class="tag warn">Private: didn't agree to be shown</span>`}
+          <span>${esc(v.email || "")}</span></div>
+        <p>${esc(v.text)}</p>
+        <div class="act">
+          ${v.status !== "approved" ? `<button class="yes" data-id="${v.id}" data-to="approved">${v.consent ? "Approve" : "Mark read"}</button>` : ""}
+          ${v.status !== "hidden" ? `<button data-id="${v.id}" data-to="hidden">Hide</button>` : ""}
+          ${v.status !== "pending" ? `<button data-id="${v.id}" data-to="pending">Back to waiting</button>` : ""}
+        </div></div>`).join("");
+  }
+  $("rv-list").addEventListener("click", async (e) => {
+    const b = e.target.closest("button[data-id]"); if (!b) return;
+    b.disabled = true;
+    const r = await fetch("/api/admin/reviews", { method: "POST", headers: { Authorization: `Bearer ${store.get()}`, "Content-Type": "application/json" }, body: JSON.stringify({ id: Number(b.dataset.id), status: b.dataset.to }) });
+    if (!r.ok) { b.disabled = false; alert("Couldn't update that review."); return; }
+    loadReviews();
+  });
+  $("rv-tabs").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    rvStatus = b.dataset.s;
+    document.querySelectorAll("#rv-tabs button").forEach((x) => x.classList.toggle("on", x === b));
+    loadReviews();
   });
   load();
 })();

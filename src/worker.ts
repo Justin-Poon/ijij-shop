@@ -10,6 +10,9 @@ import { onRequestPost as webhook } from "../functions/api/stripe-webhook.ts";
 import { onRequestPost as resend } from "../functions/api/admin/resend.ts";
 import { onRequestGet as stats } from "../functions/api/admin/stats.ts";
 import { onRequestPost as track } from "../functions/api/track.ts";
+import { onRequestPost as submitReview } from "../functions/api/review.ts";
+import { onRequestGet as publicReviews } from "../functions/api/reviews.ts";
+import { onRequestGet as adminReviews, onRequestPost as moderateReview } from "../functions/api/admin/reviews.ts";
 import { onRequestGet as download } from "../functions/download/[token].ts";
 
 type Handler = (ctx: any) => Response | Promise<Response>;
@@ -23,6 +26,10 @@ const ROUTES: [method: string, path: string | RegExp, handler: Handler][] = [
   ["POST", "/api/admin/resend", resend],
   ["GET", "/api/admin/stats", stats],
   ["POST", "/api/track", track],
+  ["POST", "/api/review", submitReview],
+  ["GET", "/api/reviews", publicReviews],
+  ["GET", "/api/admin/reviews", adminReviews],
+  ["POST", "/api/admin/reviews", moderateReview],
   ["GET", /^\/download\/([^/]+)$/, download],
 ];
 
@@ -34,13 +41,18 @@ export default {
     if (url.hostname.endsWith(".workers.dev") && env.SITE_URL && !env.SITE_URL.includes(".workers.dev")) {
       return Response.redirect(env.SITE_URL + pathname + url.search, 301);
     }
+    const allow: string[] = [];
     for (const [method, path, handler] of ROUTES) {
       const match = typeof path === "string" ? (pathname === path ? [] : null) : pathname.match(path);
       if (!match) continue;
-      if (request.method !== method) return new Response("Method not allowed", { status: 405, headers: { Allow: method } });
+      if (request.method !== method) {
+        allow.push(method);
+        continue;
+      }
       const params = typeof path === "string" ? {} : { token: match[1] };
       return handler({ request, env, params, waitUntil: (p: Promise<unknown>) => ctx.waitUntil(p) });
     }
+    if (allow.length) return new Response("Method not allowed", { status: 405, headers: { Allow: allow.join(", ") } });
     return env.ASSETS.fetch(request);
   },
 };

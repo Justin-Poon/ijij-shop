@@ -142,4 +142,25 @@ H=$(curl -sf "$SITE/admin"); [[ "$H" == *"Shop stats"* ]] && pass "stats page lo
 H=$(curl -sf "$SITE/policies"); [[ "$H" == *"Refunds"* && "$H" == *"Australian Consumer Law"* ]] && pass "policies page loads" || fail "policies page"
 [[ "$(field "$C" upgrade.available)" == true ]] && pass "upgrade offered when the 21-day link is set" || fail "upgrade availability: $C"
 
+# 8. Reviews: saved as pending, hidden until approved, verified when the email matches an order
+H=$(curl -sf "$SITE/review"); [[ "$H" == *"How did it go?"* ]] && pass "review page loads" || fail "review page"
+CODE=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$SITE/api/review" -H 'Content-Type: application/json' -d '{"name":"Tok","email":"tok@example.com","stars":5,"text":"x"}')
+[[ "$CODE" == 400 ]] && pass "too-short review rejected" || fail "short review $CODE"
+R=$(post /api/review '{"name":"Tok B.","email":"TOK@example.com","stars":5,"text":"The planner made Tokyo so easy.","consent":true}')
+[[ "$(field "$R" ok)" == true ]] && pass "review submitted" || fail "review submit: $R"
+post /api/review '{"name":"Shy","email":"shy@example.com","stars":4,"text":"Great but please keep this private.","consent":false}' >/dev/null
+P=$(curl -sf "$SITE/api/reviews"); [[ "$P" == "[]" ]] && pass "nothing public before approval" || fail "public before approval: $P"
+CODE=$(curl -s -o /dev/null -w '%{http_code}' "$SITE/api/admin/reviews")
+[[ "$CODE" == 401 ]] && pass "review admin needs the token" || fail "review admin auth $CODE"
+A=$(curl -sf "$SITE/api/admin/reviews?status=pending" -H "Authorization: Bearer $ADMIN")
+TOKID=$(node -e 'const d=JSON.parse(process.argv[1]);const r=d.reviews.find(x=>x.name==="Tok B.");console.log(r&&r.verified===1?r.id:"")' "$A")
+SHYID=$(node -e 'const d=JSON.parse(process.argv[1]);const r=d.reviews.find(x=>x.name==="Shy");console.log(r&&r.verified===0?r.id:"")' "$A")
+[[ -n "$TOKID" && -n "$SHYID" ]] && pass "buyer's review marked verified, stranger's not" || fail "verified flags: $A"
+curl -sf -X POST "$SITE/api/admin/reviews" -H "Authorization: Bearer $ADMIN" -H 'Content-Type: application/json' -d "{\"id\":$TOKID,\"status\":\"approved\"}" >/dev/null
+curl -sf -X POST "$SITE/api/admin/reviews" -H "Authorization: Bearer $ADMIN" -H 'Content-Type: application/json' -d "{\"id\":$SHYID,\"status\":\"approved\"}" >/dev/null
+P=$(curl -sf "$SITE/api/reviews")
+[[ "$P" == *"Tok B."* && "$P" == *'"verified":true'* && "$P" != *"Shy"* && "$P" != *"@"* ]] && pass "approved review public, private one never shown, no emails" || fail "public reviews: $P"
+CODE=$(curl -s -o /dev/null -w '%{http_code}' "$SITE/api/review")
+[[ "$CODE" == 405 ]] && pass "GET /api/review is 405" || fail "review method $CODE"
+
 echo "All end-to-end checks passed."

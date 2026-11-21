@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Leave a review | itsjustinjapan</title>
+<meta name="description" content="Tell me how your Japan trip went with the itsjustinjapan guide and planner.">
+<link rel="icon" href="/brand/profile.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  .stars-pick { display: flex; gap: 6px; margin: 0 0 18px; }
+  .stars-pick button {
+    border: 0; background: none; padding: 4px; cursor: pointer; color: var(--field-line); font-size: 2rem; line-height: 0;
+  }
+  .stars-pick button.on { color: var(--maroon); }
+  .stars-pick button:focus-visible { outline: 2px solid var(--maroon); outline-offset: 2px; border-radius: 6px; }
+  .stars-pick .ic { width: 1em; height: 1em; }
+  textarea.field { min-height: 150px; resize: vertical; line-height: 1.5; }
+  .hint { font-size: .85rem; color: var(--muted); margin: -8px 0 16px; }
+  .consent { align-items: flex-start; }
+  .consent input { margin-top: 1px; }
+  .done { background: var(--blush-soft); border-radius: 12px; padding: 20px; }
+  .done h2 { margin: 0 0 6px; font-size: 1.25rem; color: var(--ink); }
+  .done p { margin: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><img src="/brand/profile.svg" alt=""><a href="/">itsjustinjapan</a></header>
+</div>
+<main class="wrap narrow">
+  <p class="kicker">Back from Japan?</p>
+  <h1>How did it go?</h1>
+  <p>I'd love to hear how the guide and planner worked for your trip. It takes a minute, and it helps the next person planning their first trip.</p>
+
+  <form id="review" novalidate>
+    <span class="label" id="stars-label">Your rating</span>
+    <div class="stars-pick" id="stars" role="radiogroup" aria-labelledby="stars-label">
+      <button type="button" role="radio" aria-checked="false" aria-label="1 star" data-v="1"><span class="ic" style="--i:url(/icons/star-fill.svg)"></span></button>
+      <button type="button" role="radio" aria-checked="false" aria-label="2 stars" data-v="2"><span class="ic" style="--i:url(/icons/star-fill.svg)"></span></button>
+      <button type="button" role="radio" aria-checked="false" aria-label="3 stars" data-v="3"><span class="ic" style="--i:url(/icons/star-fill.svg)"></span></button>
+      <button type="button" role="radio" aria-checked="false" aria-label="4 stars" data-v="4"><span class="ic" style="--i:url(/icons/star-fill.svg)"></span></button>
+      <button type="button" role="radio" aria-checked="false" aria-label="5 stars" data-v="5"><span class="ic" style="--i:url(/icons/star-fill.svg)"></span></button>
+    </div>
+
+    <label class="label" for="text">Your review</label>
+    <textarea class="field" id="text" maxlength="1500" placeholder="What helped most? Anything you'd tell a friend who's about to go?" required></textarea>
+
+    <label class="label" for="name">Your name, as you'd like it shown</label>
+    <input class="field" id="name" maxlength="40" autocomplete="given-name" placeholder="e.g. Sarah or Sarah K." required>
+
+    <label class="label" for="email">The email you ordered with</label>
+    <input class="field" id="email" type="email" autocomplete="email" inputmode="email" placeholder="Enter your email" required>
+    <p class="hint">Never shown. I only use it to check you bought the guide.</p>
+
+    <label class="consent"><input type="checkbox" id="consent" checked> It's OK to show my review and name on the itsjustinjapan shop</label>
+
+    <p class="pay-error" id="err" role="alert"></p>
+    <div id="turnstile" class="turnstile"></div>
+    <button class="purchase" id="send" type="submit">Send review</button>
+  </form>
+
+  <div class="done" id="done" hidden>
+    <h2>Thank you!</h2>
+    <p>Your review's been sent. I read every one before it goes on the site.</p>
+    <p style="margin-top:12px"><a href="/">Back to the shop</a></p>
+  </div>
+</main>
+<footer>
+  <nav><a href="/policies#contact">Contact</a><a href="/policies#privacy">Privacy</a></nav>
+  © itsjustinjapan
+</footer>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const state = { stars: 0, turnstile: "", turnstileId: null, busy: false };
+  const qs = new URLSearchParams(location.search);
+  if (qs.get("name")) $("name").value = qs.get("name").slice(0, 40);
+  if (qs.get("email")) $("email").value = qs.get("email").slice(0, 254);
+
+  const stars = [...document.querySelectorAll("#stars button")];
+  function setStars(v) {
+    state.stars = v;
+    stars.forEach((b) => {
+      const n = Number(b.dataset.v);
+      b.classList.toggle("on", n <= v);
+      b.setAttribute("aria-checked", String(n === v));
+      b.tabIndex = n === (v || 1) ? 0 : -1;
+    });
+  }
+  stars.forEach((b) => b.addEventListener("click", () => setStars(Number(b.dataset.v))));
+  $("stars").addEventListener("keydown", (e) => {
+    const step = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
+    if (!step) return;
+    e.preventDefault();
+    const v = Math.min(5, Math.max(1, (state.stars || 0) + step));
+    setStars(v);
+    stars[v - 1].focus();
+  });
+  setStars(0);
+
+  fetch("/api/config").then((r) => r.json()).then((cfg) => {
+    if (!cfg.turnstileSiteKey) return;
+    window.onTurnstileLoad = function () {
+      state.turnstileId = window.turnstile.render("#turnstile", {
+        sitekey: cfg.turnstileSiteKey,
+        action: "review",
+        appearance: "interaction-only",
+        callback: (t) => (state.turnstile = t),
+        "before-interactive-callback": () => $("turnstile").classList.add("show"),
+        "after-interactive-callback": () => $("turnstile").classList.remove("show"),
+        "error-callback": () => $("turnstile").classList.add("show"),
+        "expired-callback": () => (state.turnstile = ""),
+      });
+    };
+    const sc = document.createElement("script");
+    sc.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad&render=explicit";
+    sc.async = true;
+    document.head.appendChild(sc);
+  }).catch(() => {});
+
+  $("review").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (state.busy) return;
+    $("err").textContent = "";
+    if (!state.stars) { $("err").textContent = "Please choose a star rating."; stars[0].focus(); return; }
+    state.busy = true;
+    $("send").disabled = true;
+    try {
+      const r = await fetch("/api/review", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          stars: state.stars, text: $("text").value, name: $("name").value, email: $("email").value,
+          consent: $("consent").checked, turnstile: state.turnstile,
+        }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        $("err").textContent = d.error || "Something went wrong. Please try again.";
+        if (window.turnstile && state.turnstileId !== null) { window.turnstile.reset(state.turnstileId); state.turnstile = ""; }
+        return;
+      }
+      $("review").hidden = true;
+      $("done").hidden = false;
+      $("done").scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch {
+      $("err").textContent = "Couldn't send. Check your connection and try again.";
+    } finally {
+      state.busy = false;
+      $("send").disabled = false;
+    }
+  });
+})();
+</script>
+</body>
+</html>

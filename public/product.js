@@ -190,17 +190,19 @@
 
   // ---- Reviews -----------------------------------------------------------------------
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  fetch("/reviews.json")
-    .then((r) => (r.ok ? r.json() : []))
-    .then((list) => {
-      if (!Array.isArray(list) || !list.length) return;
+  // Reviews left on /review (once approved) come first, then the Etsy reviews in reviews.json.
+  const getList = (url) => fetch(url).then((r) => (r.ok ? r.json() : [])).then((l) => (Array.isArray(l) ? l : [])).catch(() => []);
+  Promise.all([getList("/api/reviews"), getList("/reviews.json")])
+    .then(([own, etsy]) => {
+      const list = [...own.map((r) => ({ ...r, source: r.verified ? "Verified buyer" : "Guide buyer" })), ...etsy.map((r) => ({ ...r, source: "Etsy review" }))];
+      if (!list.length) return;
       const track = $("review-track");
       track.innerHTML = list
         .map((rv) => {
           const stars = '<span class="ic star" style="--i:url(/icons/star-fill.svg)"></span>'.repeat(Math.max(1, Math.min(5, rv.stars || 5)));
           return `<article class="review">
             <div class="stars" aria-label="${rv.stars || 5} out of 5">${stars}</div>
-            <div class="who"><span class="initial">${esc((rv.name || "?").trim()[0] || "?")}</span>${esc(rv.name || "")}</div>
+            <div class="who"><span class="initial">${esc((rv.name || "?").trim()[0] || "?")}</span><span>${esc(rv.name || "")}<small class="src">${esc(rv.source)}</small></span></div>
             <p class="text">${esc(rv.text || "")}</p>
             <button type="button" class="more">Show more</button>
           </article>`;

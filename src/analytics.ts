@@ -84,7 +84,7 @@ export const TURNSTILE_ACTION = "checkout";
  * Check a Cloudflare Turnstile token with Siteverify (canonical checks: success, expected action,
  * and an approved frontend hostname). Skipped when TURNSTILE_SECRET isn't set (local dev).
  */
-export async function turnstileOk(env: Env, token: unknown, request: Request): Promise<boolean> {
+export async function turnstileOk(env: Env, token: unknown, request: Request, action: string = TURNSTILE_ACTION): Promise<boolean> {
   if (!env.TURNSTILE_SECRET) return true;
   const expectedHostnames = new Set(
     (env.TURNSTILE_HOSTNAMES ?? "")
@@ -111,7 +111,7 @@ export async function turnstileOk(env: Env, token: unknown, request: Request): P
     console.error("turnstile siteverify failed", err);
     return false;
   }
-  const ok = result.success === true && result.action === TURNSTILE_ACTION && !!result.hostname && expectedHostnames.has(result.hostname);
+  const ok = result.success === true && result.action === action && !!result.hostname && expectedHostnames.has(result.hostname);
   if (!ok) console.warn("turnstile rejected", { action: result.action, hostname: result.hostname, errors: result["error-codes"] });
   return ok;
 }
