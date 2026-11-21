@@ -34,7 +34,7 @@
 - [ ] Back cover: consider the round profile logo instead of the arch badge, to match the cover
 - [ ] Daikanyama T-Site photo (Jonathan Lin, Wikimedia Commons): add its licence, e.g. "CC BY-SA 4.0", to the credit, as Creative Commons requires
 - [ ] Contents page numbers: re-check after the layout tightening
-- [ ] Polaroid drop shadows: Chrome's export saves their soft masks as JPEG, which Apple's viewers show as grey boxes. Patched in the live PDF (masks re-encoded losslessly, 21 Nov). After each re-export, run the same fix, or drop the CSS box-shadow on polaroids
+- [ ] **Guide builder: remove the CSS `box-shadow` on polaroids** (and any other shadowed images). Chrome exports shadows as soft masks that Apple's viewers draw as grey boxes. Already stripped from the live PDF (21 Nov). Consider a hairline border instead, so white frames don't blend into the page
 
 ## Later
 - [ ] `www.itsjustinjapan.com` points to a Namecheap parking page: add www as a custom domain on the `itsjustinjapan` Pages project
