@@ -10,6 +10,7 @@ enabled = true
 [assets]
 directory = "public"
 binding = "ASSETS"
+run_worker_first = true   # so the workers.dev → custom domain redirect runs for pages too
 
 [vars]
 # Public URL of the shop, no trailing slash. Local dev overrides it in .dev.vars.
