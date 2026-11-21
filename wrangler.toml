@@ -13,7 +13,7 @@ binding = "ASSETS"
 
 [vars]
 # Public URL of the shop, no trailing slash. Local dev overrides it in .dev.vars.
-SITE_URL = "https://ijij-shop.contactjustinjapan.workers.dev"
+SITE_URL = "https://shop.itsjustinjapan.com"
 EMAIL_FROM = "Justin from itsjustinjapan <hello@example.com>"
 # How long a download link works, and how many times.
 DOWNLOAD_DAYS = "60"
@@ -26,7 +26,7 @@ STRIPE_PRICE_UPGRADE = "price_1UdEfIAg0KVyXnxVQjL62lxe"
 # Cloudflare Turnstile (bot check on Purchase). The site key is public; the secret is the
 # TURNSTILE_SECRET Worker secret. Tokens must come from one of these hostnames (never localhost here).
 TURNSTILE_SITE_KEY = "0x4AAAAAAGK4-1hsupdepr_B"
-TURNSTILE_HOSTNAMES = "ijij-shop.contactjustinjapan.workers.dev,shop.itsjustinjapan.com"
+TURNSTILE_HOSTNAMES = "shop.itsjustinjapan.com"
 
 [[d1_databases]]
 binding = "DB"

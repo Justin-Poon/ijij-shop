@@ -16,7 +16,7 @@
 - [ ] Re-test once the PDF, planner links and email are in: email arrives, download works, refund turns the link off
 - [x] Decide which payment methods to offer: Stripe currently shows card, Link, Klarna and Zip (Stripe Dashboard → Settings → Payment methods)
 - [ ] **Go live** (domain: `shop.itsjustinjapan.com`; itsjustinjapan.com is already on this Cloudflare account)
-  - [ ] Attach `shop.itsjustinjapan.com` to the `ijij-shop` Worker; set `SITE_URL` to it
+  - [x] Attach `shop.itsjustinjapan.com` to the `ijij-shop` Worker; set `SITE_URL` to it (21 Nov)
   - [ ] Stripe live mode: products (A$40 bundle, A$10 upgrade), JAPLAN10 coupon + promo code, webhook → `https://shop.itsjustinjapan.com/api/stripe-webhook`
   - [ ] Live keys as Worker secrets (`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`); live price IDs in `wrangler.toml`
   - [ ] Stripe → Settings → Payment method domains: add `shop.itsjustinjapan.com` (Apple Pay / Google Pay)

@@ -28,7 +28,12 @@ const ROUTES: [method: string, path: string | RegExp, handler: Handler][] = [
 
 export default {
   async fetch(request: Request, env: Env & { ASSETS: Fetcher }, ctx: ExecutionContext): Promise<Response> {
-    const { pathname } = new URL(request.url);
+    const url = new URL(request.url);
+    const { pathname } = url;
+    // The shop lives on its own domain; send the old workers.dev address there (Turnstile only allows the real domain).
+    if (url.hostname.endsWith(".workers.dev") && env.SITE_URL && !env.SITE_URL.includes(".workers.dev")) {
+      return Response.redirect(env.SITE_URL + pathname + url.search, 301);
+    }
     for (const [method, path, handler] of ROUTES) {
       const match = typeof path === "string" ? (pathname === path ? [] : null) : pathname.match(path);
       if (!match) continue;
