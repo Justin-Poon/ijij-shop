@@ -4,6 +4,7 @@ export interface Env {
 
   SITE_URL: string;
   EMAIL_FROM: string;
+  EMAIL_REPLY_TO?: string;
   DOWNLOAD_DAYS: string;
   DOWNLOAD_MAX: string;
   GUIDE_KEY: string;

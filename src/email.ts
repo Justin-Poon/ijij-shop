@@ -53,7 +53,7 @@ export async function sendDeliveryEmail(env: Env, d: Delivery): Promise<boolean>
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: env.EMAIL_FROM, to: [d.order.email], subject, text, html }),
+    body: JSON.stringify({ from: env.EMAIL_FROM, to: [d.order.email], subject, text, html, ...(env.EMAIL_REPLY_TO ? { reply_to: env.EMAIL_REPLY_TO } : {}) }),
   });
   if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()}`);
   return true;

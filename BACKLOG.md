@@ -1,12 +1,14 @@
 # Backlog
 
 ## Before launch
-- [ ] **Planner template links.** Check `canva.link/yfzhz27fc56f3ft` opens as a *template* ("Use template"), not the live 14-day design. Get the 21-day planner's template link (Canva: Share → More → Template link). Add both as Worker secrets `PLANNER_14_URL` and `PLANNER_21_URL`.
+- [x] 14-day template link checked and saved (21 Nov). 21-day link still needed. Original note: **Planner template links.** Check `canva.link/yfzhz27fc56f3ft` opens as a *template* ("Use template"), not the live 14-day design. Get the 21-day planner's template link (Canva: Share → More → Template link). Add both as Worker secrets `PLANNER_14_URL` and `PLANNER_21_URL`.
 - [x] Stripe test keys as Worker secrets: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`
 - [x] Stripe webhook → `/api/stripe-webhook` (events `payment_intent.succeeded`, `charge.refunded`), secret as `STRIPE_WEBHOOK_SECRET`
 - [x] `ADMIN_TOKEN` secret, for the resend tool
 - [ ] Upload the guide PDF to the R2 bucket `ijij-shop-files`. For launch: the 10 Nov export (OneDrive `guide-builder/exports/ijij-japan-guide-final-20261110-0656.pdf`), which Claude then gives the new cover and shrinks
-- [ ] Resend account + `RESEND_API_KEY`; set `EMAIL_FROM` to a real address on your domain
+- [ ] Resend: add domain `itsjustinjapan.com` (region Tokyo), verify DNS, create a sending key, save as Worker secret `RESEND_API_KEY` (sender `hello@itsjustinjapan.com` is already set)
+- [ ] Cloudflare Email Routing: forward `hello@itsjustinjapan.com` to your inbox so customer replies reach you
+- [ ] 21-day upgrade: get its Canva template link, or hide the upgrade at launch
 - [x] Rate limits on checkout, quotes and tracking (built in)
 - [ ] Turnstile widget: create it in Cloudflare (Turnstile → Add widget, hostname `ijij-shop.contactjustinjapan.workers.dev` + later `shop.<domain>`, mode Managed). Add the site key as `TURNSTILE_SITE_KEY` and the secret key as `TURNSTILE_SECRET` (both Worker secrets)
 - [x] Analytics: visits, checkouts and orders by source at `/admin` (password = ADMIN_TOKEN)

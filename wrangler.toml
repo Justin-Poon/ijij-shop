@@ -15,7 +15,9 @@ run_worker_first = true   # so the workers.dev → custom domain redirect runs f
 [vars]
 # Public URL of the shop, no trailing slash. Local dev overrides it in .dev.vars.
 SITE_URL = "https://shop.itsjustinjapan.com"
-EMAIL_FROM = "Justin from itsjustinjapan <hello@example.com>"
+EMAIL_FROM = "Justin from itsjustinjapan <hello@itsjustinjapan.com>"
+# Where customer replies go (Cloudflare Email Routing forwards hello@ to your inbox).
+EMAIL_REPLY_TO = "hello@itsjustinjapan.com"
 # How long a download link works, and how many times.
 DOWNLOAD_DAYS = "60"
 DOWNLOAD_MAX = "15"
