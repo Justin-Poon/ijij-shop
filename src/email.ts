@@ -45,14 +45,16 @@ ${d.planners.map((p) => link(p.url, `Open the ${p.label.replace(" (Canva templat
 
 /** Returns false if email isn't configured, so the caller can try again later. */
 export async function sendDeliveryEmail(env: Env, d: Delivery): Promise<boolean> {
-  if (!env.RESEND_API_KEY) {
+  // Accept the key saved as RESEND_API_KEY or, as typed in the dashboard, RESEND-API-KEY.
+  const resendKey = env.RESEND_API_KEY || (env as unknown as Record<string, string | undefined>)["RESEND-API-KEY"];
+  if (!resendKey) {
     console.log(`[email skipped: no RESEND_API_KEY] order=${d.order.id}`);
     return false;
   }
   const { subject, text, html } = deliveryEmail(env, d);
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
-    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+    headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({ from: env.EMAIL_FROM, to: [d.order.email], subject, text, html, ...(env.EMAIL_REPLY_TO ? { reply_to: env.EMAIL_REPLY_TO } : {}) }),
   });
   if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()}`);
