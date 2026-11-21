@@ -202,3 +202,4 @@ header.top a { color: var(--ink); text-decoration: none; }
 .faq summary:focus-visible { outline: 2px solid var(--maroon); outline-offset: 2px; border-radius: 4px; }
 .faq details p { margin: 0 2px 12px; color: var(--body); }
 .faq details p:last-child { margin-bottom: 16px; }
+.reviews-note { margin: 0 0 12px; font-weight: 600; color: var(--ink); }
