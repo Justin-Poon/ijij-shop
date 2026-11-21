@@ -43,6 +43,8 @@ Live Stripe is ready: products, JAPLAN10, and a webhook to shop.itsjustinjapan.c
 - [ ] **Guide builder: remove the CSS `box-shadow` on polaroids** (and any other shadowed images). Chrome exports shadows as soft masks that Apple's viewers draw as grey boxes. Already stripped from the live PDF (21 Nov). Consider a hairline border instead, so white frames don't blend into the page
 
 ## Later
+- [ ] **21-day planner upgrade.** The copy "21-Day" `DAHbhvqaGgs` already has the outfit, packing and accommodation pages removed. Still to do: apply the price/rating updates and swaps (`edit-spec.json` approach, same as the 14-day), rename it "NEW 2027 SHOP VERSION – 21-Day Japan Travel Planner", make a template link, then set Worker secret `PLANNER_21_URL`. That turns on the A$10 upgrade at checkout.
+- [ ] 14-day planner: bold "Reservation:" on the Gyukatsu Motomura card (p44), and add street addresses for Kamado Gohan Ikkoku and Giraffa
 - [ ] `www.itsjustinjapan.com` points to a Namecheap parking page: add www as a custom domain on the `itsjustinjapan` Pages project
 - [ ] Add a DMARC record (`_dmarc`) and Private Email's DKIM record if not done
 - [ ] Real customer reviews in `public/reviews.json` (e.g. Etsy reviews)
