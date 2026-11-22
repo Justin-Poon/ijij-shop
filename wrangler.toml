@@ -23,6 +23,7 @@ DOWNLOAD_DAYS = "60"
 DOWNLOAD_MAX = "15"
 # R2 object key of the guide PDF.
 GUIDE_KEY = "japan-the-complete-guide.pdf"
+# Stripe prices in USD (TEST mode). Set them here only: a dashboard variable with the same name overrides these.
 # Stripe prices in USD (TEST mode). Live IDs, for launch: bundle price_1UeOKMAg0KVyXnxVknA6ZWKE, upgrade price_1UeOGmAg0KVyXnxVOLfnipdc
 STRIPE_PRICE_BUNDLE = "price_1UeOKLAg0KVyXnxVpEVJBjYL"
 STRIPE_PRICE_UPGRADE = "price_1UeOGcAg0KVyXnxVOyQNKITI"
