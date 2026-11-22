@@ -91,7 +91,7 @@
   const store = { get: () => { try { return sessionStorage.getItem("ijij-admin") || ""; } catch { return ""; } },
                   set: (v) => { try { sessionStorage.setItem("ijij-admin", v); } catch {} },
                   clear: () => { try { sessionStorage.removeItem("ijij-admin"); } catch {} } };
-  const money = (c) => "US" + new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format((c || 0) / 100);
+  const money = (c) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format((c || 0) / 100);
   const pct = (x) => (x == null ? "–" : (x * 100).toFixed(1) + "%");
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   const label = (s) => ({ tiktok: "TikTok", instagram: "Instagram", direct: "Direct / unknown", unknown: "Before tracking", facebook: "Facebook", youtube: "YouTube", search: "Search", email: "Email" })[s] || s.replace(/^other:/, "");
