@@ -188,6 +188,10 @@
     }
   });
 
+  // ---- "Last checked" month in the FAQ: always the current month ----------------------
+  const checked = $("checked-month");
+  if (checked) checked.textContent = new Date().toLocaleDateString("en-AU", { month: "long", year: "numeric" });
+
   // ---- Reviews -----------------------------------------------------------------------
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   // Reviews left on /review (once approved) come first, then the Etsy reviews in reviews.json.
