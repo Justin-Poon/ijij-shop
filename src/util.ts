@@ -16,9 +16,11 @@ export function escapeHtml(s: string): string {
 }
 
 export function formatMoney(amount: number, currency: string): string {
-  // en-US shows AUD as "A$", so overseas buyers don't read it as US dollars. Whole amounts drop the ".00".
+  // Always say which dollar: en-US shows AUD as "A$", and USD gets an explicit "US$" so Australian
+  // buyers don't read "$40" as A$40. Whole amounts drop the ".00".
   const whole = amount % 100 === 0;
-  return new Intl.NumberFormat("en-US", {
+  const prefix = currency.toLowerCase() === "usd" ? "US" : "";
+  return prefix + new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: currency.toUpperCase(),
     minimumFractionDigits: whole ? 0 : 2,

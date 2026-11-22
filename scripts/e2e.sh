@@ -45,7 +45,7 @@ field() { node -e 'const o=JSON.parse(process.argv[1]); console.log(process.argv
 sign() { node --experimental-strip-types --no-warnings -e "import('./src/stripe.ts').then(async m=>console.log(await m.signPayload('$WHSEC', process.argv[1])))" "$1"; }
 
 C=$(curl -sf "$SITE/api/config")
-[[ "$(field "$C" bundle.display)" == "A\$39" && "$(field "$C" upgrade.display)" == "A\$10" && "$(field "$C" publishableKey)" == pk_test_mock ]] && pass "config: prices + publishable key" || fail "config: $C"
+[[ "$(field "$C" bundle.display)" == "US\$39" && "$(field "$C" upgrade.display)" == "US\$10" && "$(field "$C" publishableKey)" == pk_test_mock ]] && pass "config: prices + publishable key" || fail "config: $C"
 
 # Quotes and discount codes
 Q=$(post /api/quote '{"upgrade":false}');               [[ "$(field "$Q" total)" == 3900 ]] && pass "quote: bundle = 3900" || fail "quote $Q"

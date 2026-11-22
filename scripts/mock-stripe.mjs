@@ -11,8 +11,8 @@ const promos = {
   OLDCODE: { id: "promo_3", code: "OLDCODE", active: true, expires_at: 1000, max_redemptions: null, times_redeemed: 0, coupon: { id: "c3", valid: true, percent_off: 20, amount_off: null, currency: null }, restrictions: { minimum_amount: null } },
 };
 const prices = {
-  price_bundle: { id: "price_bundle", unit_amount: 3900, currency: "aud", active: true },
-  price_upgrade: { id: "price_upgrade", unit_amount: 1000, currency: "aud", active: true },
+  price_bundle: { id: "price_bundle", unit_amount: 3900, currency: "usd", active: true },
+  price_upgrade: { id: "price_upgrade", unit_amount: 1000, currency: "usd", active: true },
 };
 let n = 0;
 

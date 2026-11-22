@@ -63,5 +63,5 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   );
   const rate = (r: Row) => ({ ...r, conversion: r.visitors ? r.orders / r.visitors : null, upgradeRate: r.orders ? r.upgrades / r.orders : null });
 
-  return json({ days, since: sinceDay, currency: "aud", sources: rows.map(rate), total: rate(total), daily: daily.results });
+  return json({ days, since: sinceDay, currency: "usd", sources: rows.map(rate), total: rate(total), daily: daily.results });
 };

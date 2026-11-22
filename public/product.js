@@ -4,7 +4,7 @@
   const $ = (id) => document.getElementById(id);
   const form = $("checkout");
   const btn = $("purchase");
-  const state = { upgrade: false, code: "", total: null, currency: "aud", stripe: null, elements: null, busy: false, turnstile: "", turnstileId: null };
+  const state = { upgrade: false, code: "", total: null, currency: "usd", stripe: null, elements: null, busy: false, turnstile: "", turnstileId: null };
 
   // ---- Attribution -------------------------------------------------------------------
   // Remember where this visitor first came from (TikTok, Instagram...) for 30 days, so a
