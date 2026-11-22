@@ -23,8 +23,8 @@ DOWNLOAD_DAYS = "60"
 DOWNLOAD_MAX = "15"
 # R2 object key of the guide PDF.
 GUIDE_KEY = "japan-the-complete-guide.pdf"
-# Stripe prices in USD (TEST mode). Live IDs, for launch: bundle price_1UeOGlAg0KVyXnxVN7jKR1Wv, upgrade price_1UeOGmAg0KVyXnxVOLfnipdc
-STRIPE_PRICE_BUNDLE = "price_1UeOGbAg0KVyXnxVAhRKB5oU"
+# Stripe prices in USD (TEST mode). Live IDs, for launch: bundle price_1UeOKMAg0KVyXnxVknA6ZWKE, upgrade price_1UeOGmAg0KVyXnxVOLfnipdc
+STRIPE_PRICE_BUNDLE = "price_1UeOKLAg0KVyXnxVpEVJBjYL"
 STRIPE_PRICE_UPGRADE = "price_1UeOGcAg0KVyXnxVOyQNKITI"
 # Cloudflare Turnstile (bot check on Purchase). The site key is public; the secret is the
 # TURNSTILE_SECRET Worker secret. Tokens must come from one of these hostnames (never localhost here).
