@@ -58,7 +58,15 @@ Live Stripe is ready: products, JAPLAN10, and a webhook to shop.itsjustinjapan.c
 - [ ] Order bump #2: shopping guide (~US$10). Checkout currently fits one bump (reserved for the 21-day upgrade); allowing two is a small change
 - [ ] Off-the-beaten-path guide as a standalone product / post-purchase upsell (only places you've been)
 - [ ] Seasonal guides as free email lead magnets (e.g. cherry blossom 2027)
-- [ ] Commission one illustration (e.g. a cover or shopfront) to test an illustrated look. Real illustrator, not AI
+- [ ] **Illustrations for the guide** (real illustrator, not AI: the FAQ sells first-hand, human picks)
+  - Where they help most, where a photo or text can't explain it as well:
+    - Intro to Japanese food: a spread of the main dishes (ramen styles, sushi, yakitori, okonomiyaki, tonkatsu, wagyu, desserts) so people know what to look for
+    - Tuna guide: akami → chutoro → otoro on one fish, from lean to fattiest, with what each tastes like
+    - Konbini picks; onsen steps; chopstick do's and don'ts; IC card and ticket gates; a simple route map for the 14-day trip
+  - Start with a pilot of 2–3 pieces (the tuna diagram and the food intro page), then decide on the rest
+  - One illustrator and one style for everything, so it feels like a real book
+  - Get commercial rights to reuse the art in the PDF, web guide, shop page and social posts
+  - Ask for transparent PNG or SVG files so they drop straight into the guide builder
 - [ ] Sales page: swipeable previews of real guide and planner pages; "Get the guide" button near the top; collapse the discount box into "Have a code?"
 - [ ] Optional: privacy policy line about anonymous visit stats (TikTok/IG attribution uses a 30-day browser ID)
 - [ ] Post-purchase upsell (things to do and eat guide)
