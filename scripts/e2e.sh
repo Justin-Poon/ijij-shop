@@ -139,7 +139,7 @@ TT=$(node -e 'const d=JSON.parse(process.argv[1]);const r=d.sources.find(s=>s.so
 IG=$(node -e 'const d=JSON.parse(process.argv[1]);const r=d.sources.find(s=>s.source==="instagram");console.log([r.visitors,r.orders].join(","))' "$S")
 [[ "$IG" == "1,0" ]] && pass "stats: instagram 1 visitor, 0 orders" || fail "stats ig: $IG"
 H=$(curl -sf "$SITE/admin"); [[ "$H" == *"Shop stats"* ]] && pass "stats page loads" || fail "admin page"
-H=$(curl -sf "$SITE/policies"); [[ "$H" == *"Refunds"* && "$H" == *"Australian Consumer Law"* ]] && pass "policies page loads" || fail "policies page"
+H=$(curl -sf "$SITE/policies"); [[ "$H" == *"Refunds"* && "$H" == *"Privacy"* ]] && pass "policies page loads" || fail "policies page"
 [[ "$(field "$C" upgrade.available)" == true ]] && pass "upgrade offered when the 21-day link is set" || fail "upgrade availability: $C"
 
 # 8. Reviews: saved as pending, hidden until approved, verified when the email matches an order
