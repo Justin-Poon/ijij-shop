@@ -62,4 +62,10 @@ Live Stripe is ready: products, JAPLAN10, and a webhook to shop.itsjustinjapan.c
 - [ ] Sales page: swipeable previews of real guide and planner pages; "Get the guide" button near the top; collapse the discount box into "Have a code?"
 - [ ] Optional: privacy policy line about anonymous visit stats (TikTok/IG attribution uses a 30-day browser ID)
 - [ ] Post-purchase upsell (things to do and eat guide)
-- [ ] Customer accounts and the web version of the guide + Planner
+- [ ] **Web version of the guide** (UI inspired by Blissbook):
+  - Every section collapsed by default, so the page is just a list of headings; tap a heading to expand it
+  - A menu that expands level by level as you tap it (chapter → section) and jumps straight to that section
+  - Works well on a phone, for looking things up on the go in Japan
+  - Access only for buyers (e.g. a private link in the order email, or a login), so it isn't freely shared
+  - Built from the same content as the PDF (the guide builder), so the two stay in sync
+- [ ] Customer accounts (if the web guide needs logins)
