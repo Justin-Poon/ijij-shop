@@ -77,3 +77,4 @@ Live Stripe is ready: products, JAPLAN10, and a webhook to shop.itsjustinjapan.c
   - Access only for buyers (e.g. a private link in the order email, or a login), so it isn't freely shared
   - Built from the same content as the PDF (the guide builder), so the two stay in sync
 - [ ] Customer accounts (if the web guide needs logins)
+- [ ] **New Notion guide** (details to come). The old CTA slide mentions "Notion and PDF versions", so decide whether Notion is a product, a bonus, or replaces the old version
