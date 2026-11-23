@@ -80,7 +80,15 @@
     <li>Prices are in US dollars (US$). Your bank may convert them to your own currency and charge a small conversion fee.</li>
   </ul>
 
-  <p style="margin-top:32px"><a href="/">Back to the shop</a></p>
+  <p style="margin-top:32px"><a href="/" id="back">Back to the shop</a></p>
+  <script>
+    // Until the new guide launches, people arriving from the waitlist go back to the waitlist, not the shop.
+    if (new URLSearchParams(location.search).get("from") === "waitlist") {
+      document.getElementById("back").href = "/waitlist";
+      document.getElementById("back").textContent = "Back to the waitlist";
+      document.querySelectorAll('header a[href="/"]').forEach((a) => (a.href = "https://itsjustinjapan.com"));
+    }
+  </script>
 </main>
 <footer>© itsjustinjapan</footer>
 </body>
