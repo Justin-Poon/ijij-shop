@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Join the waitlist | itsjustinjapan</title>
+<meta name="description" content="Be first to get the new itsjustinjapan Japan guide.">
+<link rel="icon" href="/brand/profile.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  .hint { font-size: .85rem; color: var(--muted); margin: -8px 0 16px; }
+  .consent { align-items: flex-start; }
+  .consent input { margin-top: 1px; }
+  .done { background: var(--blush-soft); border-radius: 12px; padding: 20px; }
+  .done h2 { margin: 0 0 6px; font-size: 1.25rem; color: var(--ink); }
+  .done p { margin: 0; }
+  .now { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--field-line); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><img src="/brand/profile.svg" alt=""><a href="/">itsjustinjapan</a></header>
+</div>
+<main class="wrap narrow">
+  <p class="kicker">Coming soon</p>
+  <h1>Be first to get my new Japan guide</h1>
+  <p>I'm rewriting my Japan guide from scratch: more of the little things I love, easier to use on the go. Join the waitlist and I'll email you the day it's out.</p>
+
+  <form id="wl" novalidate>
+    <label class="label" for="email">Email</label>
+    <input class="field" id="email" type="email" autocomplete="email" inputmode="email" placeholder="Enter your email" required>
+
+    <label class="label" for="name">First name <span class="muted">(optional)</span></label>
+    <input class="field" id="name" maxlength="40" autocomplete="given-name">
+
+    <label class="label" for="month">When are you going? <span class="muted">(optional)</span></label>
+    <select class="field" id="month"><option value="">Not sure yet</option></select>
+
+    <label class="consent"><input type="checkbox" id="consent"> Email me when the new guide is out, plus the occasional Japan tip. Unsubscribe any time.</label>
+
+    <p class="pay-error" id="err" role="alert"></p>
+    <div id="turnstile" class="turnstile"></div>
+    <button class="purchase" id="send" type="submit">Join the waitlist</button>
+  </form>
+
+  <div class="done" id="done" hidden>
+    <h2>You're on the list!</h2>
+    <p>I'll email you as soon as the new guide is ready.</p>
+  </div>
+
+  <p class="now">Going sooner? The current <a href="/">2027 Travel Guide + 14-Day Planner</a> is available now.</p>
+</main>
+<footer>
+  <nav><a href="/policies#contact">Contact</a><a href="/policies#privacy">Privacy</a></nav>
+  © itsjustinjapan
+</footer>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const state = { turnstile: "", turnstileId: null, busy: false };
+  const src = new URLSearchParams(location.search).get("src") || "";
+  // Travel months: this month and the next 17.
+  const d = new Date(); d.setDate(1);
+  for (let i = 0; i < 18; i++) {
+    const o = document.createElement("option");
+    o.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    o.textContent = d.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+    $("month").append(o);
+    d.setMonth(d.getMonth() + 1);
+  }
+
+  fetch("/api/config").then((r) => r.json()).then((cfg) => {
+    if (!cfg.turnstileSiteKey) return;
+    window.onTurnstileLoad = function () {
+      state.turnstileId = window.turnstile.render("#turnstile", {
+        sitekey: cfg.turnstileSiteKey, action: "waitlist", appearance: "interaction-only",
+        callback: (t) => (state.turnstile = t),
+        "before-interactive-callback": () => $("turnstile").classList.add("show"),
+        "after-interactive-callback": () => $("turnstile").classList.remove("show"),
+        "error-callback": () => $("turnstile").classList.add("show"),
+        "expired-callback": () => (state.turnstile = ""),
+      });
+    };
+    const sc = document.createElement("script");
+    sc.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad&render=explicit";
+    sc.async = true;
+    document.head.appendChild(sc);
+  }).catch(() => {});
+
+  $("wl").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (state.busy) return;
+    $("err").textContent = "";
+    state.busy = true; $("send").disabled = true;
+    try {
+      const r = await fetch("/api/waitlist", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: $("email").value, name: $("name").value, travel_month: $("month").value, consent: $("consent").checked, source: src, turnstile: state.turnstile }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        $("err").textContent = d.error || "Something went wrong. Please try again.";
+        if (window.turnstile && state.turnstileId !== null) { window.turnstile.reset(state.turnstileId); state.turnstile = ""; }
+        return;
+      }
+      $("wl").hidden = true; $("done").hidden = false;
+    } catch {
+      $("err").textContent = "Couldn't connect. Please try again.";
+    } finally {
+      state.busy = false; $("send").disabled = false;
+    }
+  });
+})();
+</script>
+</body>
+</html>

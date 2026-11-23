@@ -78,3 +78,9 @@ Live Stripe is ready: products, JAPLAN10, and a webhook to shop.itsjustinjapan.c
   - Built from the same content as the PDF (the guide builder), so the two stay in sync
 - [ ] Customer accounts (if the web guide needs logins)
 - [ ] **New Notion guide** (details to come). The old CTA slide mentions "Notion and PDF versions", so decide whether Notion is a product, a bonus, or replaces the old version
+
+## Waitlist (added 23 Nov 2026)
+- [x] /waitlist sign-up (email, optional name and travel month, consent), admin count + CSV export, footer link
+- [ ] Put shop.itsjustinjapan.com/waitlist?src=ig (and ?src=tiktok) in the bio alongside the shop link
+- [ ] Resend: verify the sending domain (DNS records), create an Audience, import waitlist.csv before launch
+- [ ] Optional: send each new sign-up to Resend automatically (needs a RESEND_API_KEY secret) and a welcome email
