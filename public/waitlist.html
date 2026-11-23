@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Join the waitlist | itsjustinjapan</title>
-<meta name="description" content="Join the waitlist for the new itsjustinjapan Japan guide: get it first, with a waitlist-only discount.">
+<meta name="description" content="Join the waitlist for the new itsjustinjapan Japan guide: get it first.">
 <link rel="icon" href="/brand/profile.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,8 +17,6 @@
   .done { background: var(--blush-soft); border-radius: 12px; padding: 20px; }
   .done h2 { margin: 0 0 6px; font-size: 1.25rem; color: var(--ink); }
   .done p { margin: 0; }
-  .badge { display: inline-block; background: var(--blush); color: var(--ink); font-weight: 700; font-size: .8rem;
-    letter-spacing: .02em; border-radius: 999px; padding: 5px 12px; margin-bottom: 12px; }
   .now { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--field-line); }
 </style>
 </head>
@@ -27,10 +25,8 @@
   <header class="top"><img src="/brand/profile.svg" alt=""><a href="https://itsjustinjapan.com">itsjustinjapan</a></header>
 </div>
 <main class="wrap narrow">
-  <span class="badge">Waitlist-only discount</span>
-  <h1>Get my new Japan guide first, for less</h1>
-  <p>I've rebuilt my Japan guide from scratch, with some <b>massive improvements</b>. Join the waitlist to get it first, with a discount only the waitlist gets.</p>
-
+  <h1>Be first to get my new Japan guide</h1>
+  <p>I've rebuilt my Japan guide from scratch, with some <b>massive improvements</b>. Join the waitlist to get it first, plus a little discount on launch day.</p>
 
   <form id="wl" novalidate>
     <label class="label" for="email">Email</label>
@@ -39,16 +35,16 @@
     <label class="label" for="month">When are you going? <span class="muted">(optional)</span></label>
     <select class="field" id="month"><option value="">Not sure yet</option></select>
 
-    <label class="consent"><input type="checkbox" id="consent"> Email me my discount when the new guide is out, plus the occasional Japan tip. Unsubscribe any time.</label>
+    <label class="consent"><input type="checkbox" id="consent"> Email me when the new guide is out, plus the occasional Japan tip. Unsubscribe any time.</label>
 
     <p class="pay-error" id="err" role="alert"></p>
     <div id="turnstile" class="turnstile"></div>
-    <button class="purchase" id="send" type="submit">Get my discount</button>
+    <button class="purchase" id="send" type="submit">Join the waitlist</button>
   </form>
 
   <div class="done" id="done" hidden>
     <h2>You're on the list!</h2>
-    <p>Your waitlist discount will land in your inbox the day the new guide is out.</p>
+    <p>I'll email you as soon as the new guide is ready.</p>
   </div>
 
   <p class="now">Going sooner? My current <a href="https://itsjustinjapan.etsy.com/listing/1614929414">14-day Japan itinerary</a> is available now.</p>
