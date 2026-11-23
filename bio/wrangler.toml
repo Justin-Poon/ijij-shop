@@ -1,0 +1,7 @@
+# Bio link site (itsjustinjapan.com): a static Worker built from this folder by Workers Builds.
+name = "itsjustinjapan-bio"
+compatibility_date = "2026-11-01"
+
+[assets]
+directory = "."
+not_found_handling = "single-page-application"   # unknown paths show the bio page, like the old Pages site
