@@ -149,6 +149,7 @@
     loadReviews();
     loadWaitlist();
     loadBio();
+    quickAdd();
   }
   function showLogin(msg) { $("stats").hidden = true; $("login").hidden = false; $("login-err").textContent = msg || ""; $("pw").focus(); }
   $("login").addEventListener("submit", (e) => { e.preventDefault(); store.set($("pw").value.trim()); load(); });
@@ -181,6 +182,15 @@
     $("bio-src").innerHTML = d.sources.map((x) => `<tr><td>${esc(label(x.source))}</td><td>${x.visitors}</td></tr>`).join("") || `<tr><td colspan="2" class="muted">–</td></tr>`;
     $("bio-camp").innerHTML = d.campaigns.map((x) => `<tr><td>${esc(x.campaign)}</td><td>${x.visitors}</td><td>${x.etsy}</td></tr>`).join("") || `<tr><td colspan="3" class="muted">None yet.</td></tr>`;
     $("bio-cc").innerHTML = d.countries.map((x) => `<tr><td>${esc(x.country)}</td><td>${x.visitors}</td></tr>`).join("") || `<tr><td colspan="2" class="muted">–</td></tr>`;
+  }
+  // Quick add from the studio's "Posted today" button: /admin#post=<title>&day=YYYY-MM-DD&platform=instagram
+  async function quickAdd() {
+    const h = new URLSearchParams(location.hash.slice(1));
+    if (!h.get("post") || !store.get()) return;
+    history.replaceState(null, "", location.pathname);
+    const r = await fetch("/api/admin/bio", { method: "POST", headers: { Authorization: `Bearer ${encodeURIComponent(store.get())}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "add", day: h.get("day"), title: h.get("post"), platform: h.get("platform") || "instagram" }) });
+    if (r.ok) { alert(`Added "${h.get("post")}" (${h.get("day")}) to Traffic from each post.`); loadBio(); }
   }
   $("bio-add").addEventListener("submit", async (e) => {
     e.preventDefault();
