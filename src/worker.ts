@@ -17,6 +17,7 @@ import { onRequestPost as joinWaitlist } from "../functions/api/waitlist.ts";
 import { onRequestGet as adminWaitlist } from "../functions/api/admin/waitlist.ts";
 import { onRequestGet as adminBio, onRequestPost as adminBioPost } from "../functions/api/admin/bio.ts";
 import { onRequestGet as download } from "../functions/download/[token].ts";
+import { adminLogin, adminLogout, withAdminCookie } from "./admin-session.ts";
 
 type Handler = (ctx: any) => Response | Promise<Response>;
 
@@ -26,6 +27,8 @@ const ROUTES: [method: string, path: string | RegExp, handler: Handler][] = [
   ["POST", "/api/intent", intent],
   ["GET", "/api/order", order],
   ["POST", "/api/stripe-webhook", webhook],
+  ["POST", "/api/admin/login", adminLogin],
+  ["POST", "/api/admin/logout", adminLogout],
   ["POST", "/api/admin/resend", resend],
   ["GET", "/api/admin/stats", stats],
   ["POST", "/api/track", track],
@@ -57,7 +60,8 @@ export default {
         continue;
       }
       const params = typeof path === "string" ? {} : { token: match[1] };
-      return handler({ request, env, params, waitUntil: (p: Promise<unknown>) => ctx.waitUntil(p) });
+      const req = pathname.startsWith("/api/admin/") ? await withAdminCookie(request, env) : request;
+      return handler({ request: req, env, params, waitUntil: (p: Promise<unknown>) => ctx.waitUntil(p) });
     }
     if (allow.length) return new Response("Method not allowed", { status: 405, headers: { Allow: allow.join(", ") } });
     return env.ASSETS.fetch(request);

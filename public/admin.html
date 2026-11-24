@@ -146,9 +146,8 @@
 <script>
 (function () {
   const $ = (id) => document.getElementById(id);
-  const store = { get: () => { try { return sessionStorage.getItem("ijij-admin") || ""; } catch { return ""; } },
-                  set: (v) => { try { sessionStorage.setItem("ijij-admin", v); } catch {} },
-                  clear: () => { try { sessionStorage.removeItem("ijij-admin"); } catch {} } };
+  // Logged in = a 90-day HttpOnly cookie from /api/admin/login (the password is never kept in the browser).
+  try { sessionStorage.removeItem("ijij-admin"); } catch {}
   const money = (c) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format((c || 0) / 100);
   const pct = (x) => (x == null ? "–" : (x * 100).toFixed(1) + "%");
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -156,10 +155,8 @@
   let days = 30;
 
   async function load() {
-    const token = store.get();
-    if (!token) return showLogin();
-    const r = await fetch(`/api/admin/stats?days=${days}`, { headers: { Authorization: `Bearer ${encodeURIComponent(token)}` } });
-    if (r.status === 401) { store.clear(); return showLogin("That password didn't work."); }
+    const r = await fetch(`/api/admin/stats?days=${days}`, {});
+    if (r.status === 401) return showLogin();
     if (!r.ok) { $("rows").innerHTML = `<tr><td colspan="7" class="err">Couldn't load stats (${r.status}).</td></tr>`; return; }
     const d = await r.json();
     $("login").hidden = true; $("stats").hidden = false;
@@ -181,8 +178,13 @@
     quickAdd();
   }
   function showLogin(msg) { $("stats").hidden = true; $("login").hidden = false; $("login-err").textContent = msg || ""; $("pw").focus(); }
-  $("login").addEventListener("submit", (e) => { e.preventDefault(); store.set($("pw").value.trim()); load(); });
-  $("logout").addEventListener("click", () => { store.clear(); showLogin(); });
+  $("login").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const r = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: $("pw").value.trim() }) });
+    if (!r.ok) return showLogin("That password didn't work.");
+    $("pw").value = ""; load();
+  });
+  $("logout").addEventListener("click", async () => { await fetch("/api/admin/logout", { method: "POST" }); showLogin(); });
   $("ranges").addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b) return;
     days = Number(b.dataset.days);
@@ -199,7 +201,7 @@
   };
   const shortDay = (d) => new Date(`${d}T12:00:00`).toLocaleDateString(undefined, { day: "numeric", month: "short" });
   async function loadBio() {
-    const r = await fetch(`/api/admin/bio?days=${days}`, { headers: { Authorization: `Bearer ${encodeURIComponent(store.get())}` } });
+    const r = await fetch(`/api/admin/bio?days=${days}`, {});
     if (!r.ok) { $("bio-tiles").innerHTML = `<p class="err">Couldn't load bio stats (${r.status}).</p>`; return; }
     const d = await r.json(); const t = d.total, pv = d.previous;
     $("bio-since").textContent = `Tracking since ${shortDay(d.trackingSince)}.`;
@@ -232,33 +234,33 @@
   }
   $("bio-posts").addEventListener("change", async (e) => {
     const el = e.target.closest("[data-views]"); if (!el) return;
-    await fetch("/api/admin/bio", { method: "POST", headers: { Authorization: `Bearer ${encodeURIComponent(store.get())}`, "Content-Type": "application/json" },
+    await fetch("/api/admin/bio", { method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "views", id: Number(el.dataset.views), views: el.value }) });
     loadBio();
   });
   // Quick add from the studio's "Posted today" button: /admin#post=<title>&day=YYYY-MM-DD&platform=instagram
   async function quickAdd() {
     const h = new URLSearchParams(location.hash.slice(1));
-    if (!h.get("post") || !store.get()) return;
+    if (!h.get("post")) return;
     history.replaceState(null, "", location.pathname);
-    const r = await fetch("/api/admin/bio", { method: "POST", headers: { Authorization: `Bearer ${encodeURIComponent(store.get())}`, "Content-Type": "application/json" },
+    const r = await fetch("/api/admin/bio", { method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "add", day: h.get("day"), title: h.get("post"), platform: h.get("platform") || "instagram" }) });
     if (r.ok) { alert(`Added "${h.get("post")}" (${h.get("day")}) to Traffic from each post.`); loadBio(); }
   }
   $("bio-add").addEventListener("submit", async (e) => {
     e.preventDefault();
-    await fetch("/api/admin/bio", { method: "POST", headers: { Authorization: `Bearer ${encodeURIComponent(store.get())}`, "Content-Type": "application/json" },
+    await fetch("/api/admin/bio", { method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "add", day: $("bio-day").value, title: $("bio-title").value, platform: $("bio-plat").value, views: $("bio-views").value }) });
     $("bio-title").value = ""; $("bio-views").value = ""; loadBio();
   });
   $("bio-posts").addEventListener("click", async (e) => {
     const b = e.target.closest("[data-del]"); if (!b || !confirm("Remove this post?")) return;
-    await fetch("/api/admin/bio", { method: "POST", headers: { Authorization: `Bearer ${encodeURIComponent(store.get())}`, "Content-Type": "application/json" }, body: JSON.stringify({ action: "delete", id: Number(b.dataset.del) }) });
+    await fetch("/api/admin/bio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "delete", id: Number(b.dataset.del) }) });
     loadBio();
   });
   // ---- Waitlist ----
   async function loadWaitlist() {
-    const r = await fetch("/api/admin/waitlist", { headers: { Authorization: `Bearer ${encodeURIComponent(store.get())}` } });
+    const r = await fetch("/api/admin/waitlist", {});
     if (!r.ok) { $("wl-sum").textContent = `Couldn't load the waitlist (${r.status}).`; return; }
     const d = await r.json();
     const bySrc = {};
@@ -266,7 +268,7 @@
     $("wl-sum").innerHTML = `<b>${d.total}</b> on the list · ${d.last7days} in the last 7 days` + (d.recent.length ? ` · recent by source: ${Object.entries(bySrc).map(([k, v]) => `${esc(k)} ${v}`).join(", ")}` : "");
   }
   $("wl-csv").onclick = async () => {
-    const r = await fetch("/api/admin/waitlist?format=csv", { headers: { Authorization: `Bearer ${encodeURIComponent(store.get())}` } });
+    const r = await fetch("/api/admin/waitlist?format=csv", {});
     if (!r.ok) return alert(`Couldn't download (${r.status})`);
     const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(await r.blob()), download: "waitlist.csv" });
     a.click();
@@ -276,8 +278,7 @@
   let rvStatus = "pending";
   const stars = (n) => "★".repeat(n) + "☆".repeat(5 - n);
   async function loadReviews() {
-    const token = store.get();
-    const r = await fetch(`/api/admin/reviews?status=${rvStatus}`, { headers: { Authorization: `Bearer ${encodeURIComponent(token)}` } });
+    const r = await fetch(`/api/admin/reviews?status=${rvStatus}`, {});
     if (!r.ok) { $("rv-list").innerHTML = `<p class="err">Couldn't load reviews (${r.status}).</p>`; return; }
     const d = await r.json();
     const c = d.counts || {};
@@ -301,7 +302,7 @@
   $("rv-list").addEventListener("click", async (e) => {
     const b = e.target.closest("button[data-id]"); if (!b) return;
     b.disabled = true;
-    const r = await fetch("/api/admin/reviews", { method: "POST", headers: { Authorization: `Bearer ${encodeURIComponent(store.get())}`, "Content-Type": "application/json" }, body: JSON.stringify({ id: Number(b.dataset.id), status: b.dataset.to }) });
+    const r = await fetch("/api/admin/reviews", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: Number(b.dataset.id), status: b.dataset.to }) });
     if (!r.ok) { b.disabled = false; alert("Couldn't update that review."); return; }
     loadReviews();
   });
