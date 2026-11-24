@@ -15,6 +15,7 @@ import { onRequestGet as publicReviews } from "../functions/api/reviews.ts";
 import { onRequestGet as adminReviews, onRequestPost as moderateReview } from "../functions/api/admin/reviews.ts";
 import { onRequestPost as joinWaitlist } from "../functions/api/waitlist.ts";
 import { onRequestGet as adminWaitlist } from "../functions/api/admin/waitlist.ts";
+import { onRequestGet as adminBio, onRequestPost as adminBioPost } from "../functions/api/admin/bio.ts";
 import { onRequestGet as download } from "../functions/download/[token].ts";
 
 type Handler = (ctx: any) => Response | Promise<Response>;
@@ -34,6 +35,8 @@ const ROUTES: [method: string, path: string | RegExp, handler: Handler][] = [
   ["POST", "/api/admin/reviews", moderateReview],
   ["POST", "/api/waitlist", joinWaitlist],
   ["GET", "/api/admin/waitlist", adminWaitlist],
+  ["GET", "/api/admin/bio", adminBio],
+  ["POST", "/api/admin/bio", adminBioPost],
   ["GET", /^\/download\/([^/]+)$/, download],
 ];
 

@@ -76,6 +76,31 @@
     <div class="chart" id="chart"></div>
     <p class="muted" id="chart-range"></p>
     <p class="muted">Conversion = orders ÷ unique visitors from that source. Refunded orders are excluded. Add <code>?src=tiktok</code> or <code>?src=ig</code> to your bio links for the cleanest split; visits from the TikTok and Instagram apps are recognised automatically too.</p>
+    <h2 style="font-size:1.05rem;margin:28px 0 4px">Bio link (itsjustinjapan.com)</h2>
+    <p class="muted" style="margin-top:0">Visits to your bio page and taps on each link, for the same date range. Unique visitors are counted once a day (no cookies).</p>
+    <div class="tiles" id="bio-tiles"></div>
+    <h3 style="font-size:.95rem;margin:14px 0 6px">Visitors per day <span class="muted" style="font-weight:400">(dark = tapped through to Etsy · ▲ = a post went out)</span></h3>
+    <div class="chart bio-chart" id="bio-chart"></div>
+    <p class="muted" id="bio-range"></p>
+    <h3 style="font-size:.95rem;margin:18px 0 6px">Traffic from each post</h3>
+    <div class="wrap"><table>
+      <thead><tr><th>Posted</th><th>Post</th><th>Views (app)</th><th>Bio visitors, 3 days</th><th>Usual for 3 days</th><th>Extra from the post</th><th>Tapped Etsy</th><th></th></tr></thead>
+      <tbody id="bio-posts"></tbody>
+    </table></div>
+    <form id="bio-add" class="controls" style="flex-wrap:wrap;gap:6px;margin-top:8px">
+      <input type="date" id="bio-day" required style="padding:6px 10px;border:1px solid var(--field-line);border-radius:8px">
+      <input id="bio-title" placeholder="Post (e.g. Free things in every area of Tokyo)" required style="flex:1;min-width:200px;padding:6px 10px;border:1px solid var(--field-line);border-radius:8px">
+      <select id="bio-plat" style="padding:6px 10px;border:1px solid var(--field-line);border-radius:8px"><option value="instagram">Instagram</option><option value="tiktok">TikTok</option></select>
+      <input id="bio-views" type="number" min="0" placeholder="Views (optional)" style="width:150px;padding:6px 10px;border:1px solid var(--field-line);border-radius:8px">
+      <button type="submit">Add post</button>
+    </form>
+    <div class="grid-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:16px">
+      <div><h3 style="font-size:.95rem;margin:0 0 6px">Taps per link</h3><div class="wrap"><table><thead><tr><th>Link</th><th>People</th><th>Taps</th></tr></thead><tbody id="bio-links"></tbody></table></div></div>
+      <div><h3 style="font-size:.95rem;margin:0 0 6px">Where visitors came from</h3><div class="wrap"><table><thead><tr><th>Source</th><th>Visitors</th></tr></thead><tbody id="bio-src"></tbody></table></div></div>
+      <div><h3 style="font-size:.95rem;margin:0 0 6px">Story / campaign links</h3><div class="wrap"><table><thead><tr><th>Campaign</th><th>Visitors</th><th>Tapped Etsy</th></tr></thead><tbody id="bio-camp"></tbody></table></div>
+        <p class="muted">Use <code>itsjustinjapan.com/?c=pokemon</code> on a story link sticker to track one post exactly.</p></div>
+      <div><h3 style="font-size:.95rem;margin:0 0 6px">Countries</h3><div class="wrap"><table><thead><tr><th>Country</th><th>Visitors</th></tr></thead><tbody id="bio-cc"></tbody></table></div></div>
+    </div>
     <h2 style="font-size:1.05rem;margin:28px 0 8px">Waitlist</h2>
     <p class="muted" style="margin-top:0">People sign up at <a href="/waitlist">/waitlist</a> (add <code>?src=ig</code> etc. to see where they came from).</p>
     <p id="wl-sum" class="muted"></p>
@@ -123,6 +148,7 @@
     $("chart-range").textContent = d.daily.length ? `${d.daily[0].day} to ${d.daily[d.daily.length - 1].day}` : "No visits yet.";
     loadReviews();
     loadWaitlist();
+    loadBio();
   }
   function showLogin(msg) { $("stats").hidden = true; $("login").hidden = false; $("login-err").textContent = msg || ""; $("pw").focus(); }
   $("login").addEventListener("submit", (e) => { e.preventDefault(); store.set($("pw").value.trim()); load(); });
@@ -132,6 +158,40 @@
     days = Number(b.dataset.days);
     document.querySelectorAll("#ranges button").forEach((x) => x.classList.toggle("on", x === b));
     load();
+  });
+  // ---- Bio link analytics ----
+  const LINK_NAMES = { "etsy-14": "Etsy: 14-day itinerary", "etsy-21": "Etsy: 21-day itinerary", "gumroad-notion": "Gumroad: Notion guide", "gumroad-solo": "Gumroad: solo women kit", waitlist: "Waitlist banner", "waitlist-link": "itsjustinjapan.com/waitlist", newsletter: "Newsletter", instagram: "Instagram icon", tiktok: "TikTok icon" };
+  async function loadBio() {
+    const r = await fetch(`/api/admin/bio?days=${days}`, { headers: { Authorization: `Bearer ${store.get()}` } });
+    if (!r.ok) { $("bio-tiles").innerHTML = `<p class="err">Couldn't load bio stats (${r.status}).</p>`; return; }
+    const d = await r.json(); const t = d.total;
+    $("bio-tiles").innerHTML = [["Bio visitors", t.visitors], ["Tapped Etsy", t.etsyClickers], ["Etsy tap rate", pct(t.etsyRate)]]
+      .map(([k, v]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+    const postDays = new Set(d.posts.map((p) => p.day));
+    const max = Math.max(1, ...d.daily.map((x) => x.visitors));
+    $("bio-chart").innerHTML = d.daily.map((x) => `<div title="${x.day}: ${x.visitors} visitors, ${x.etsy} tapped Etsy${postDays.has(x.day) ? " · post went out" : ""}" style="height:${Math.round((x.visitors / max) * 100)}%;position:relative">
+        <span style="position:absolute;left:0;right:0;bottom:0;height:${x.visitors ? Math.round((x.etsy / x.visitors) * 100) : 0}%;background:var(--maroon)"></span>
+        ${postDays.has(x.day) ? `<span style="position:absolute;left:50%;bottom:100%;transform:translateX(-50%);font-size:11px;color:var(--maroon)">▲</span>` : ""}</div>`).join("");
+    $("bio-range").textContent = d.daily.length ? `${d.daily[0].day} to ${d.daily[d.daily.length - 1].day}` : "No visits recorded yet.";
+    $("bio-posts").innerHTML = d.posts.length ? d.posts.map((p) => `<tr><td>${esc(p.day)}</td><td>${esc(p.title)} <span class="muted">${p.platform === "tiktok" ? "TikTok" : "IG"}</span></td>
+        <td>${p.views ?? "–"}</td><td>${p.visitors}</td><td>${p.baseline}</td><td><b>+${p.extra}</b></td><td>${p.etsy}</td>
+        <td><button data-del="${p.id}" style="border:0;background:none;color:var(--maroon);cursor:pointer">✕</button></td></tr>`).join("")
+      : `<tr><td colspan="8" class="muted">Add each post below (date it went out) to see how much traffic it drove.</td></tr>`;
+    $("bio-links").innerHTML = d.links.map((l) => `<tr><td>${esc(LINK_NAMES[l.target] || l.target)}</td><td>${l.people}</td><td>${l.clicks}</td></tr>`).join("") || `<tr><td colspan="3" class="muted">No taps yet.</td></tr>`;
+    $("bio-src").innerHTML = d.sources.map((x) => `<tr><td>${esc(label(x.source))}</td><td>${x.visitors}</td></tr>`).join("") || `<tr><td colspan="2" class="muted">–</td></tr>`;
+    $("bio-camp").innerHTML = d.campaigns.map((x) => `<tr><td>${esc(x.campaign)}</td><td>${x.visitors}</td><td>${x.etsy}</td></tr>`).join("") || `<tr><td colspan="3" class="muted">None yet.</td></tr>`;
+    $("bio-cc").innerHTML = d.countries.map((x) => `<tr><td>${esc(x.country)}</td><td>${x.visitors}</td></tr>`).join("") || `<tr><td colspan="2" class="muted">–</td></tr>`;
+  }
+  $("bio-add").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    await fetch("/api/admin/bio", { method: "POST", headers: { Authorization: `Bearer ${store.get()}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "add", day: $("bio-day").value, title: $("bio-title").value, platform: $("bio-plat").value, views: $("bio-views").value }) });
+    $("bio-title").value = ""; $("bio-views").value = ""; loadBio();
+  });
+  $("bio-posts").addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-del]"); if (!b || !confirm("Remove this post?")) return;
+    await fetch("/api/admin/bio", { method: "POST", headers: { Authorization: `Bearer ${store.get()}`, "Content-Type": "application/json" }, body: JSON.stringify({ action: "delete", id: Number(b.dataset.del) }) });
+    loadBio();
   });
   // ---- Waitlist ----
   async function loadWaitlist() {

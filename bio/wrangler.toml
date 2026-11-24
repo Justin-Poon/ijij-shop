@@ -1,7 +1,16 @@
-# Bio link site (itsjustinjapan.com): a static Worker built from this folder by Workers Builds.
+# Bio link site (itsjustinjapan.com), built from this folder by Workers Builds.
+# worker.ts counts page views and link clicks (into the shop's D1 database), then serves the static page.
 name = "itsjustinjapan-bio"
+main = "worker.ts"
 compatibility_date = "2026-11-01"
 
 [assets]
 directory = "."
+binding = "ASSETS"
+run_worker_first = true
 not_found_handling = "single-page-application"   # unknown paths show the bio page, like the old Pages site
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ijij-shop"
+database_id = "d72ff882-c071-4cc1-b8e8-9ed09204de9e"

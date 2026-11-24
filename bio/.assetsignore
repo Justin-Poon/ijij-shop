@@ -3,3 +3,5 @@ README.md
 .assetsignore
 node_modules
 .wrangler
+worker.ts
+_redirects
