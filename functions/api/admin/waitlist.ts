@@ -2,7 +2,7 @@
 // The launch waitlist: counts and the list (CSV for importing into Resend or another email tool).
 
 import type { Env } from "../../../src/env.ts";
-import { json } from "../../../src/util.ts";
+import { isAdmin, json } from "../../../src/util.ts";
 
 const csvCell = (v: unknown) => {
   const s = String(v ?? "");
@@ -11,7 +11,7 @@ const csvCell = (v: unknown) => {
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const auth = request.headers.get("Authorization") ?? "";
-  if (!env.ADMIN_TOKEN || auth !== `Bearer ${env.ADMIN_TOKEN}`) return json({ error: "unauthorised" }, 401);
+  if (!isAdmin(request, env)) return json({ error: "unauthorised" }, 401);
   const rows = (await env.DB.prepare(
     `SELECT created_at, email, name, travel_month, source FROM waitlist WHERE unsubscribed_at IS NULL ORDER BY created_at DESC`,
   ).all()).results as Record<string, unknown>[];

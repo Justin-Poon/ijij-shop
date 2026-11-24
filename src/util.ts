@@ -25,3 +25,18 @@ export function formatMoney(amount: number, currency: string): string {
     maximumFractionDigits: 2,
   }).format(amount / 100);
 }
+
+/** Admin check for /api/admin/*: the admin page sends the password URI-encoded (so any character works);
+ *  both sides are trimmed so a stray space or line break in the saved secret doesn't lock you out. */
+export function isAdmin(request: Request, env: { ADMIN_TOKEN?: string }): boolean {
+  const secret = (env.ADMIN_TOKEN ?? "").trim();
+  if (!secret) return false;
+  const raw = (request.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
+  let given = raw;
+  try { given = decodeURIComponent(raw); } catch {}
+  given = given.trim();
+  if (given.length !== secret.length) return false;
+  let diff = 0;
+  for (let i = 0; i < secret.length; i++) diff |= secret.charCodeAt(i) ^ given.charCodeAt(i);
+  return diff === 0;
+}

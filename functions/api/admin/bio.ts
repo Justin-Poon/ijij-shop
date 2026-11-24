@@ -5,9 +5,9 @@
 
 import type { Env } from "../../../src/env.ts";
 import { melbourneDay } from "../../../src/analytics.ts";
-import { json } from "../../../src/util.ts";
+import { isAdmin, json } from "../../../src/util.ts";
 
-const authed = (request: Request, env: Env) => !!env.ADMIN_TOKEN && request.headers.get("Authorization") === `Bearer ${env.ADMIN_TOKEN}`;
+const authed = (request: Request, env: Env) => isAdmin(request, env);
 const uniq = `COUNT(DISTINCT COALESCE(visitor, CAST(id AS TEXT)))`;
 const addDays = (day: string, n: number) => new Date(Date.parse(`${day}T12:00:00Z`) + n * 86400_000).toISOString().slice(0, 10);
 

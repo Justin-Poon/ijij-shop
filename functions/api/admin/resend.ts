@@ -5,11 +5,11 @@
 import type { Env } from "../../../src/env.ts";
 import { downloadUrl, issueDownloadToken, plannersFor, type OrderRow } from "../../../src/fulfil.ts";
 import { sendDeliveryEmail } from "../../../src/email.ts";
-import { json } from "../../../src/util.ts";
+import { isAdmin, json } from "../../../src/util.ts";
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const auth = request.headers.get("Authorization") ?? "";
-  if (!env.ADMIN_TOKEN || auth !== `Bearer ${env.ADMIN_TOKEN}`) return json({ error: "unauthorised" }, 401);
+  if (!isAdmin(request, env)) return json({ error: "unauthorised" }, 401);
 
   const body = (await request.json().catch(() => ({}))) as { email?: string };
   const email = body.email?.trim().toLowerCase();

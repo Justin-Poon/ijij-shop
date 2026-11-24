@@ -3,7 +3,7 @@
 
 import type { Env } from "../../../src/env.ts";
 import { melbourneDay } from "../../../src/analytics.ts";
-import { json } from "../../../src/util.ts";
+import { isAdmin, json } from "../../../src/util.ts";
 
 interface Row {
   source: string;
@@ -17,7 +17,7 @@ interface Row {
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const auth = request.headers.get("Authorization") ?? "";
-  if (!env.ADMIN_TOKEN || auth !== `Bearer ${env.ADMIN_TOKEN}`) return json({ error: "unauthorised" }, 401);
+  if (!isAdmin(request, env)) return json({ error: "unauthorised" }, 401);
 
   const days = Math.min(Math.max(Number(new URL(request.url).searchParams.get("days")) || 30, 1), 365);
   const since = new Date(Date.now() - (days - 1) * 86400_000);

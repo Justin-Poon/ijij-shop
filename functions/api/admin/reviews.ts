@@ -3,13 +3,13 @@
 // Lets the owner approve or hide reviews. Only approved reviews with the customer's consent go on the shop.
 
 import type { Env } from "../../../src/env.ts";
-import { json } from "../../../src/util.ts";
+import { isAdmin, json } from "../../../src/util.ts";
 
 const STATUSES = new Set(["pending", "approved", "hidden"]);
 
 function authorised(request: Request, env: Env): boolean {
   const auth = request.headers.get("Authorization") ?? "";
-  return !!env.ADMIN_TOKEN && auth === `Bearer ${env.ADMIN_TOKEN}`;
+  return isAdmin(request, env);
 }
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
