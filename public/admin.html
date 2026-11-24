@@ -12,6 +12,7 @@
 <style>
   :root { --maroon:#6b1234; --blush:#fae2e0; --ink:#111; --body:#2a2426; --muted:#7a6d70; --rule:#ece4e5; --bg:#fff; --card:#fff; }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body { margin: 0; background: var(--bg); color: var(--body); font: 15px/1.5 Inter, system-ui, sans-serif; }
   main { max-width: 980px; margin: 0 auto; padding: 20px 16px 48px; }
   header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
@@ -21,7 +22,7 @@
   .controls button { border: 1px solid var(--rule); background: #fff; border-radius: 999px; padding: 7px 14px; font: 600 .9rem Inter; cursor: pointer; color: var(--body); }
   .controls button.on { background: var(--maroon); border-color: var(--maroon); color: #fff; }
   .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 22px; }
-  @media (min-width: 720px) { .tiles { grid-template-columns: repeat(5, 1fr); } }
+  @media (min-width: 720px) { .tiles { grid-template-columns: repeat(5, 1fr); } #bio-tiles { grid-template-columns: repeat(4, 1fr); } }
   .tile { border: 1px solid var(--rule); border-radius: 12px; padding: 12px 14px; }
   .tile .k { font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
   .tile .v { font-size: 1.5rem; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
@@ -29,6 +30,16 @@
   table { border-collapse: collapse; width: 100%; min-width: 640px; font-variant-numeric: tabular-nums; }
   th, td { padding: 10px 12px; text-align: right; border-bottom: 1px solid var(--rule); white-space: nowrap; }
   th:first-child, td:first-child { text-align: left; }
+  .grid-2 table { min-width: 0; }
+  table.posts th:nth-child(2), table.posts td:nth-child(2) { text-align: left; }
+  table.posts .mob { display: none; }
+  @media (max-width: 600px) {
+    table.posts { min-width: 0; }
+    table.posts th:first-child, table.posts td:first-child { display: none; }
+    table.posts td:nth-child(2) { min-width: 150px !important; padding-left: 12px; }
+    table.posts .mob { display: inline; }
+    table.posts th { white-space: normal; }
+  }
   th { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; background: #fcf8f8; }
   tr.total td { font-weight: 700; border-bottom: 0; }
   .bar { display: inline-block; height: 8px; border-radius: 4px; background: var(--maroon); vertical-align: middle; margin-left: 8px; }
@@ -39,6 +50,19 @@
   form.login input { padding: 12px; border: 1px solid var(--rule); border-radius: 8px; font: 15px Inter; }
   form.login button { padding: 12px; border: 0; border-radius: 8px; background: var(--maroon); color: #fff; font: 600 15px Inter; cursor: pointer; }
   .err { color: #b3261e; }
+  h2.sec { font-size: 1.15rem; color: var(--ink); margin: 34px 0 6px; padding-top: 14px; border-top: 1px solid var(--rule); scroll-margin-top: 12px; }
+  h2.sec:first-of-type { margin-top: 8px; border-top: 0; padding-top: 0; }
+  h3.sub { font-size: .95rem; margin: 14px 0 6px; color: var(--ink); }
+  .jump { display: flex; gap: 14px; flex-wrap: wrap; margin: -6px 0 14px; font-size: .9rem; }
+  .jump a { color: var(--maroon); font-weight: 600; text-decoration: none; }
+  .tile .d { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+  .tile .d.up { color: #1d7a3a; } .tile .d.down { color: #b3261e; }
+  .chartbox { position: relative; padding-left: 34px; }
+  .chartbox .ymax { position: absolute; left: 0; top: 4px; font-size: .75rem; color: var(--muted); }
+  .chartbox .chart { margin-top: 4px; }
+  .xaxis { display: flex; justify-content: space-between; padding-left: 34px; font-size: .75rem; color: var(--muted); }
+  .fld { padding: 6px 10px; border: 1px solid var(--rule); border-radius: 8px; font: 14px Inter; }
+  input.views { width: 84px; padding: 4px 6px; border: 1px solid var(--rule); border-radius: 6px; font: 14px Inter; text-align: right; }
   .rv { border: 1px solid var(--rule); border-radius: 12px; padding: 14px; margin: 0 0 10px; }
   .rv .meta { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; font-size: .85rem; color: var(--muted); margin-bottom: 6px; }
   .rv .meta b { color: var(--ink); font-size: .95rem; }
@@ -66,46 +90,51 @@
     <div class="controls" id="ranges">
       <button data-days="1">Today</button><button data-days="7">7 days</button><button data-days="30" class="on">30 days</button><button data-days="90">90 days</button>
     </div>
-    <div class="tiles" id="tiles"></div>
-    <h2 style="font-size:1.05rem;margin:0 0 8px">By source</h2>
-    <div class="wrap"><table>
-      <thead><tr><th>Source</th><th>Visitors</th><th>Started checkout</th><th>Orders</th><th>Conversion</th><th>Revenue</th><th>Took 21-day</th></tr></thead>
-      <tbody id="rows"></tbody>
-    </table></div>
-    <h2 style="font-size:1.05rem;margin:22px 0 0">Visitors per day</h2>
-    <div class="chart" id="chart"></div>
-    <p class="muted" id="chart-range"></p>
-    <p class="muted">Conversion = orders ÷ unique visitors from that source. Refunded orders are excluded. Add <code>?src=tiktok</code> or <code>?src=ig</code> to your bio links for the cleanest split; visits from the TikTok and Instagram apps are recognised automatically too.</p>
-    <h2 style="font-size:1.05rem;margin:28px 0 4px">Bio link (itsjustinjapan.com)</h2>
-    <p class="muted" style="margin-top:0">Visits to your bio page and taps on each link, for the same date range. Unique visitors are counted once a day (no cookies).</p>
+    <nav class="jump"><a href="#bio">Bio link</a><a href="#shop">Shop</a><a href="#waitlist">Waitlist</a><a href="#reviews">Reviews</a></nav>
+    <h2 id="bio" class="sec">Bio link <span class="muted" style="font-weight:400">itsjustinjapan.com</span></h2>
+    <p class="muted" style="margin-top:0">Visits to your bio page and taps on each link. Unique visitors are counted once a day (no cookies). <span id="bio-since"></span></p>
     <div class="tiles" id="bio-tiles"></div>
-    <h3 style="font-size:.95rem;margin:14px 0 6px">Visitors per day <span class="muted" style="font-weight:400">(dark = tapped through to Etsy · ▲ = a post went out)</span></h3>
-    <div class="chart bio-chart" id="bio-chart"></div>
-    <p class="muted" id="bio-range"></p>
-    <h3 style="font-size:.95rem;margin:18px 0 6px">Traffic from each post</h3>
-    <div class="wrap"><table>
-      <thead><tr><th>Posted</th><th>Post</th><th>Views (app)</th><th>Bio visitors, 3 days</th><th>Usual for 3 days</th><th>Extra from the post</th><th>Tapped Etsy</th><th></th></tr></thead>
+    <h3 class="sub">Visitors per day <span class="muted" style="font-weight:400">(dark = tapped through to Etsy · ▲ = a post went out, hover for which)</span></h3>
+    <div class="chartbox"><span class="ymax" id="bio-ymax"></span><div class="chart bio-chart" id="bio-chart"></div></div>
+    <div class="xaxis"><span id="bio-x0"></span><span id="bio-x1"></span></div>
+    <h3 class="sub" style="margin-top:22px">Traffic from each post</h3>
+    <p class="muted" style="margin:0 0 8px">Posts you mark as posted in IJIJ Studio show up here by themselves. Type the view count from Instagram / TikTok insights into the Views box to see Etsy taps per 1,000 views.</p>
+    <div class="wrap"><table class="posts">
+      <thead><tr><th>Posted</th><th>Post</th><th>Extra visitors</th><th>Tapped Etsy</th><th>Bio visitors</th><th>Usual</th><th>Views</th><th>Etsy / 1k views</th><th></th></tr></thead>
       <tbody id="bio-posts"></tbody>
     </table></div>
+    <p class="muted" style="margin-top:6px">Bio visitors and Etsy taps count the day it went out plus the next 2 days. <b>Usual</b> is what a normal stretch that long looks like (from up to 7 days before); it needs 3 days of tracking first, so early posts show –.</p>
+    <details style="margin-top:6px"><summary class="muted" style="cursor:pointer">Add a post by hand (e.g. a TikTok-only post)</summary>
     <form id="bio-add" class="controls" style="flex-wrap:wrap;gap:6px;margin-top:8px">
-      <input type="date" id="bio-day" required style="padding:6px 10px;border:1px solid var(--field-line);border-radius:8px">
-      <input id="bio-title" placeholder="Post (e.g. Free things in every area of Tokyo)" required style="flex:1;min-width:200px;padding:6px 10px;border:1px solid var(--field-line);border-radius:8px">
-      <select id="bio-plat" style="padding:6px 10px;border:1px solid var(--field-line);border-radius:8px"><option value="instagram">Instagram</option><option value="tiktok">TikTok</option></select>
-      <input id="bio-views" type="number" min="0" placeholder="Views (optional)" style="width:150px;padding:6px 10px;border:1px solid var(--field-line);border-radius:8px">
+      <input type="date" id="bio-day" required class="fld">
+      <input id="bio-title" placeholder="Post (e.g. Free things in every area of Tokyo)" required class="fld" style="flex:1;min-width:200px">
+      <select id="bio-plat" class="fld"><option value="instagram">Instagram</option><option value="tiktok">TikTok</option></select>
+      <input id="bio-views" type="number" min="0" placeholder="Views (optional)" class="fld" style="width:150px">
       <button type="submit">Add post</button>
-    </form>
-    <div class="grid-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:16px">
+    </form></details>
+    <div class="grid-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px;margin-top:16px">
       <div><h3 style="font-size:.95rem;margin:0 0 6px">Taps per link</h3><div class="wrap"><table><thead><tr><th>Link</th><th>People</th><th>Taps</th></tr></thead><tbody id="bio-links"></tbody></table></div></div>
       <div><h3 style="font-size:.95rem;margin:0 0 6px">Where visitors came from</h3><div class="wrap"><table><thead><tr><th>Source</th><th>Visitors</th></tr></thead><tbody id="bio-src"></tbody></table></div></div>
       <div><h3 style="font-size:.95rem;margin:0 0 6px">Story / campaign links</h3><div class="wrap"><table><thead><tr><th>Campaign</th><th>Visitors</th><th>Tapped Etsy</th></tr></thead><tbody id="bio-camp"></tbody></table></div>
         <p class="muted">Use <code>itsjustinjapan.com/?c=pokemon</code> on a story link sticker to track one post exactly.</p></div>
       <div><h3 style="font-size:.95rem;margin:0 0 6px">Countries</h3><div class="wrap"><table><thead><tr><th>Country</th><th>Visitors</th></tr></thead><tbody id="bio-cc"></tbody></table></div></div>
     </div>
-    <h2 style="font-size:1.05rem;margin:28px 0 8px">Waitlist</h2>
+    <h2 id="shop" class="sec">Shop <span class="muted" style="font-weight:400">shop.itsjustinjapan.com</span></h2>
+    <div class="tiles" id="tiles"></div>
+    <h3 class="sub">By source</h3>
+    <div class="wrap"><table>
+      <thead><tr><th>Source</th><th>Visitors</th><th>Started checkout</th><th>Orders</th><th>Conversion</th><th>Revenue</th><th>Took 21-day</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+    <h3 class="sub" style="margin-top:22px">Visitors per day</h3>
+    <div class="chart" id="chart"></div>
+    <p class="muted" id="chart-range"></p>
+    <p class="muted">Conversion = orders ÷ unique visitors from that source. Refunded orders are excluded. Add <code>?src=tiktok</code> or <code>?src=ig</code> to your bio links for the cleanest split; visits from the TikTok and Instagram apps are recognised automatically too.</p>
+    <h2 id="waitlist" class="sec">Waitlist</h2>
     <p class="muted" style="margin-top:0">People sign up at <a href="/waitlist">/waitlist</a> (add <code>?src=ig</code> etc. to see where they came from).</p>
     <p id="wl-sum" class="muted"></p>
     <p><button id="wl-csv" style="border:1px solid var(--field-line);background:#fff;border-radius:999px;padding:6px 14px;font:600 .9rem Inter;cursor:pointer">Download CSV (for Resend)</button></p>
-    <h2 style="font-size:1.05rem;margin:28px 0 8px">Reviews</h2>
+    <h2 id="reviews" class="sec">Reviews</h2>
     <p class="muted" style="margin-top:0">Customers leave these at <a href="/review">/review</a>. Nothing shows on the shop until you approve it, and only if they ticked "OK to show".</p>
     <div class="controls" id="rv-tabs">
       <button data-s="pending" class="on">Waiting</button><button data-s="approved">On the shop</button><button data-s="hidden">Hidden</button>
@@ -162,27 +191,51 @@
   });
   // ---- Bio link analytics ----
   const LINK_NAMES = { "etsy-14": "Etsy: 14-day itinerary", "etsy-21": "Etsy: 21-day itinerary", "gumroad-notion": "Gumroad: Notion guide", "gumroad-solo": "Gumroad: solo women kit", waitlist: "Waitlist banner", "waitlist-link": "itsjustinjapan.com/waitlist", newsletter: "Newsletter", instagram: "Instagram icon", tiktok: "TikTok icon" };
+  const delta = (now, before, has) => {
+    if (!has) return `<div class="d">no earlier data yet</div>`;
+    if (!before) return now ? `<div class="d up">new</div>` : `<div class="d">–</div>`;
+    const ch = (now - before) / before;
+    return `<div class="d ${ch >= 0 ? "up" : "down"}">${ch >= 0 ? "▲" : "▼"} ${Math.abs(Math.round(ch * 100))}% vs previous ${days === 1 ? "day" : days + " days"}</div>`;
+  };
+  const shortDay = (d) => new Date(`${d}T12:00:00`).toLocaleDateString(undefined, { day: "numeric", month: "short" });
   async function loadBio() {
     const r = await fetch(`/api/admin/bio?days=${days}`, { headers: { Authorization: `Bearer ${encodeURIComponent(store.get())}` } });
     if (!r.ok) { $("bio-tiles").innerHTML = `<p class="err">Couldn't load bio stats (${r.status}).</p>`; return; }
-    const d = await r.json(); const t = d.total;
-    $("bio-tiles").innerHTML = [["Bio visitors", t.visitors], ["Tapped Etsy", t.etsyClickers], ["Etsy tap rate", pct(t.etsyRate)]]
-      .map(([k, v]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
-    const postDays = new Set(d.posts.map((p) => p.day));
+    const d = await r.json(); const t = d.total, pv = d.previous;
+    $("bio-since").textContent = `Tracking since ${shortDay(d.trackingSince)}.`;
+    const wl = d.links.filter((l) => l.target.startsWith("waitlist")).reduce((n, l) => n + l.people, 0);
+    $("bio-tiles").innerHTML = [
+      ["Bio visitors", t.visitors, delta(t.visitors, pv.visitors, pv.hasData)],
+      ["Tapped Etsy", t.etsyClickers, delta(t.etsyClickers, pv.etsyClickers, pv.hasData)],
+      ["Etsy tap rate", pct(t.etsyRate), `<div class="d">of bio visitors</div>`],
+      ["Tapped waitlist", wl, `<div class="d">people</div>`],
+    ].map(([k, v, dd]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div>${dd}</div>`).join("");
+    const postsOn = {};
+    d.posts.forEach((p) => (postsOn[p.day] = [...(postsOn[p.day] || []), p.title]));
     const max = Math.max(1, ...d.daily.map((x) => x.visitors));
-    $("bio-chart").innerHTML = d.daily.map((x) => `<div title="${x.day}: ${x.visitors} visitors, ${x.etsy} tapped Etsy${postDays.has(x.day) ? " · post went out" : ""}" style="height:${Math.round((x.visitors / max) * 100)}%;position:relative">
+    $("bio-ymax").textContent = max;
+    $("bio-chart").innerHTML = d.daily.map((x) => `<div title="${shortDay(x.day)}: ${x.visitors} visitors, ${x.etsy} tapped Etsy${postsOn[x.day] ? " · posted: " + esc(postsOn[x.day].join(", ")) : ""}" style="height:${Math.round((x.visitors / max) * 100)}%;position:relative">
         <span style="position:absolute;left:0;right:0;bottom:0;height:${x.visitors ? Math.round((x.etsy / x.visitors) * 100) : 0}%;background:var(--maroon)"></span>
-        ${postDays.has(x.day) ? `<span style="position:absolute;left:50%;bottom:100%;transform:translateX(-50%);font-size:11px;color:var(--maroon)">▲</span>` : ""}</div>`).join("");
-    $("bio-range").textContent = d.daily.length ? `${d.daily[0].day} to ${d.daily[d.daily.length - 1].day}` : "No visits recorded yet.";
-    $("bio-posts").innerHTML = d.posts.length ? d.posts.map((p) => `<tr><td>${esc(p.day)}</td><td>${esc(p.title)} <span class="muted">${p.platform === "tiktok" ? "TikTok" : "IG"}</span></td>
-        <td>${p.views ?? "–"}</td><td>${p.visitors}</td><td>${p.baseline}</td><td><b>+${p.extra}</b></td><td>${p.etsy}</td>
-        <td><button data-del="${p.id}" style="border:0;background:none;color:var(--maroon);cursor:pointer">✕</button></td></tr>`).join("")
-      : `<tr><td colspan="8" class="muted">Add each post below (date it went out) to see how much traffic it drove.</td></tr>`;
+        ${postsOn[x.day] ? `<span style="position:absolute;left:50%;bottom:100%;transform:translateX(-50%);font-size:11px;color:var(--maroon)">▲</span>` : ""}</div>`).join("");
+    $("bio-x0").textContent = d.daily.length ? shortDay(d.daily[0].day) : "No visits recorded yet.";
+    $("bio-x1").textContent = d.daily.length > 1 ? shortDay(d.daily[d.daily.length - 1].day) : "";
+    $("bio-posts").innerHTML = d.posts.length ? d.posts.map((p) => `<tr><td>${shortDay(p.day)}</td>
+        <td style="white-space:normal;min-width:180px">${esc(p.title)} <span class="muted"><span class="mob">${shortDay(p.day)} · </span>${p.platform === "tiktok" ? "TikTok" : "IG"}${p.days < 3 ? ` · ${p.days} day${p.days > 1 ? "s" : ""} so far` : ""}</span></td>
+        <td>${p.extra == null ? "–" : `<b>+${p.extra}</b>`}</td><td>${p.etsy}</td><td>${p.visitors}</td><td>${p.baseline ?? "–"}</td>
+        <td><input class="views" type="number" min="0" data-views="${p.id}" value="${p.views ?? ""}" placeholder="–"></td><td>${p.etsyPer1k ?? "–"}</td>
+        <td><button data-del="${p.id}" title="Remove" style="border:0;background:none;color:var(--maroon);cursor:pointer">✕</button></td></tr>`).join("")
+      : `<tr><td colspan="9" class="muted">Mark a post as posted in IJIJ Studio (or add one by hand below) to see how much traffic it drove.</td></tr>`;
     $("bio-links").innerHTML = d.links.map((l) => `<tr><td>${esc(LINK_NAMES[l.target] || l.target)}</td><td>${l.people}</td><td>${l.clicks}</td></tr>`).join("") || `<tr><td colspan="3" class="muted">No taps yet.</td></tr>`;
     $("bio-src").innerHTML = d.sources.map((x) => `<tr><td>${esc(label(x.source))}</td><td>${x.visitors}</td></tr>`).join("") || `<tr><td colspan="2" class="muted">–</td></tr>`;
     $("bio-camp").innerHTML = d.campaigns.map((x) => `<tr><td>${esc(x.campaign)}</td><td>${x.visitors}</td><td>${x.etsy}</td></tr>`).join("") || `<tr><td colspan="3" class="muted">None yet.</td></tr>`;
     $("bio-cc").innerHTML = d.countries.map((x) => `<tr><td>${esc(x.country)}</td><td>${x.visitors}</td></tr>`).join("") || `<tr><td colspan="2" class="muted">–</td></tr>`;
   }
+  $("bio-posts").addEventListener("change", async (e) => {
+    const el = e.target.closest("[data-views]"); if (!el) return;
+    await fetch("/api/admin/bio", { method: "POST", headers: { Authorization: `Bearer ${encodeURIComponent(store.get())}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "views", id: Number(el.dataset.views), views: el.value }) });
+    loadBio();
+  });
   // Quick add from the studio's "Posted today" button: /admin#post=<title>&day=YYYY-MM-DD&platform=instagram
   async function quickAdd() {
     const h = new URLSearchParams(location.hash.slice(1));
