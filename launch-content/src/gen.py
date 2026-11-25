@@ -38,22 +38,22 @@ def make(name,w,h,title,fs,top,pts=None,sub=None,pages=None,ptop=700,pw=500,cta=
     if cta: body+=f'<div class="cta">{cta}</div>'
     pg=page(w,h,ptop,pages,pw=pw) if pages else ""
     open(f"{name}.html","w").write(f'<!doctype html><html><head><meta charset="utf-8"><style>{css}</style></head><body><div class="bg"></div><div class="warm"></div>{pg}<div class="head">{body}</div>{extra}</body></html>')
-FEATS=[("A <em>14-day</em> plan,<br>ready to go",["Hotels, food and things to do, mapped out","A Canva template you can change","Or how to split 7, 10 or 14 days"],["p6-006-b.png","p96-096-b.png"]),
- ("Every <em>neighbourhood</em><br>explained",["Tokyo, area by area","Hakone, Kyoto, Osaka, Nara and more","The places I'd send a friend"],["p76-076-b.png","p77-077-b.png"]),
- ("What to <em>book</em><br>and when",["The sell-out list","When each one opens","Visas, apps and SIMs"],["p19-019-b.png","p20-020-b.png"]),
- ("Skip the <em>mistakes</em><br>I made",["The top 9 mistakes","Etiquette, simply","Bins, late trains and more"],["p95-095-b.png","p68-068-b.png"]),
- ("Spend <em>smarter</em>",["What to budget per day","The new 2026 tax-free rules","What's worth the suitcase space"],["p32-032-b.png","p26-026-b.png"]),
- ("Eat like a <em>local</em>",["How to order anywhere","Konbini favourites","Special diets"],["p70-070-b.png","p72-072-b.png"])]
+FEATS=[("My <em>14-day</em> trip,<br>all planned for you",["Where I'd stay, eat and go, day by day","Swap anything around in Canva","Or how I'd split 7, 10 or 14 days"],["p6-006-b.png","p96-096-b.png"]),
+ ("Where I'd go,<br><em>area</em> by area",["Tokyo, neighbourhood by neighbourhood","Then Hakone, Kyoto, Osaka, Nara and more","The spots I'd tell a friend about"],["p76-076-b.png","p77-077-b.png"]),
+ ("What to <em>book</em><br>before you go",["The stuff that sells out fast","When it opens, and how hard I've found it","Visas, apps and SIMs, sorted early"],["p19-019-b.png","p20-020-b.png"]),
+ ("Learn from<br>my <em>mistakes</em>",["My top 9 to avoid","Etiquette, minus the stress","Bins, late trains and more"],["p95-095-b.png","p68-068-b.png"]),
+ ("What Japan<br><em>actually</em> costs",["A day's budget, honestly","The new 2026 tax-free rules","What I always make room for"],["p32-032-b.png","p26-026-b.png"]),
+ ("How I <em>eat</em><br>in Japan",["Ordering without the panic","My konbini go-tos","Vegetarian, vegan and allergy tips"],["p70-070-b.png","p72-072-b.png"])]
 # ---- Pinned carousel 1080x1350
-make("c01",1080,1350,"The <em>complete</em><br>guide to Japan",128,100,tag="The good stuff I’d only tell a friend",sub="I rewrote my Japan guide from scratch.<br>Here's what's inside 👉",pages=["p1-001.png"],ptop=640,pw=460)
+make("c01",1080,1350,"My guide<br>to <em>Japan</em>",132,100,tag="The good stuff I’d only tell a friend",sub="I rewrote my Japan guide from scratch.<br>Here's what's inside 👉",pages=["p1-001.png"],ptop=640,pw=460)
 for i,(t,p,pg) in enumerate(FEATS):
     make(f"c{i+2:02d}",1080,1350,t,104,90,pts=p,pages=pg,ptop=720,pw=430)
-make("c08",1080,1350,"102 pages,<br>made for <em>your</em> trip",112,170,sub="Guide + 14-day planner<br>Instant download · phone or print",cta="Link in bio",pages=["p1-001.png"],ptop=760,pw=380)
+make("c08",1080,1350,"Everything I\'d tell<br>a <em>friend</em> going<br>to Japan",104,150,sub="My guide + my 14-day plan<br>Phone or print, straight away",cta="Link in bio",pages=["p1-001.png"],ptop=760,pw=380)
 # ---- Story pack 1080x1920 (leave the lower third clear for a link sticker)
-make("s01-teaser",1080,1920,"Something<br>I've been <em>working on</em> 👀",120,260,sub="My Japan guide, rewritten from scratch.<br>More soon.",pages=["p76-076-b.png","p96-096-b.png"],ptop=920,pw=470,br=90)
-make("s02-live",1080,1920,"It's <em>here</em>",170,220,tag="The good stuff I’d only tell a friend",sub="The complete guide to Japan<br>+ 14-day planner",pages=["p1-001.png"],ptop=720,pw=560,br=90)
+make("s01-teaser",1080,1920,"Okay so I've been<br><em>working on</em> something 👀",112,260,sub="Late nights, weekends, 100+ pages.<br>I rewrote my Japan guide from scratch.<br>More soon!",pages=["p76-076-b.png","p96-096-b.png"],ptop=980,pw=470,br=90)
+make("s02-live",1080,1920,"It's <em>here</em>",170,220,tag="The good stuff I’d only tell a friend",sub="My new guide to Japan<br>+ my 14-day plan. Thank you for waiting 🫶",pages=["p1-001.png"],ptop=720,pw=560,br=90)
 for i,(t,p,pg) in enumerate(FEATS[:4]):
     make(f"s{i+3:02d}-feature",1080,1920,t,120,200,pts=p,pages=pg,ptop=900,pw=470,br=90)
-make("s07-waitlist",1080,1920,"On the <em>waitlist</em>?",140,300,sub="Your launch-day thank-you is in your inbox.<br>Check your email (and spam) 💌",pages=["p1-001.png"],ptop=820,pw=460,br=90)
-make("s08-objections",1080,1920,"“Is it <em>worth it</em> if I've<br>already planned?”",104,260,sub="Yes. Most of the guide is the stuff<br>you only learn once you're there:<br>how to order, what to book, where not to stay.",pages=["p95-095-b.png","p70-070-b.png"],ptop=1000,pw=440,br=90)
+make("s07-waitlist",1080,1920,"On the <em>waitlist</em>?",140,300,sub="I\'ve sent you a little thank-you.<br>Check your email (and spam) 💌",pages=["p1-001.png"],ptop=820,pw=460,br=90)
+make("s08-objections",1080,1920,"“Is it <em>worth it</em> if I've<br>already planned?”",104,260,sub="Honestly, yes. Most of it is the stuff<br>I only learnt once I was there:<br>how to order, what to book, where not to stay.",pages=["p95-095-b.png","p70-070-b.png"],ptop=1000,pw=440,br=90)
 print("ok")
