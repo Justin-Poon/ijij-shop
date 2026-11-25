@@ -14,3 +14,5 @@ Done: 01 hero · 02 planner · 03 neighbourhoods · 04 what to book · 05 mistak
 05 the Canva planner · 06 tips you only learn the hard way · 07 proof (5,000+ travellers, reviews) · 08 what you get.
 
 Background options (blurred Japanese photos, Unsplash): shoji = De An Sun, tatami = Yosuke Ota, kyoto = Fabrizio Chiagano. See options/.
+
+Previews blur page body text below each page heading (src/*-b.png, Gaussian 7px) so the listing shows layout, not content. No eyebrow labels above titles.
