@@ -56,6 +56,10 @@ Live Stripe is ready: products, JAPLAN10, and a webhook to shop.itsjustinjapan.c
 - [ ] **Getting the review link to buyers** (nothing sends it yet). Options: a line in the order email (easy, but arrives before the trip); an automatic email ~3 weeks after purchase, or after their trip if checkout asks for travel dates (best, ~1 hour: daily Cron Trigger + email)
 - [ ] Follow-up email sequence and buyers added to the email list
 - [ ] Order bump #2: shopping guide (~US$10). Checkout currently fits one bump (reserved for the 21-day upgrade); allowing two is a small change
+- [ ] **Travelling Japan with kids guide** (idea, 25 Nov). Justin has a baby on the way, so this can grow with first-hand trips.
+  Ideas: strollers vs carriers on trains and stations, kid-friendly stays (family rooms, ryokan with kids), baby rooms and
+  nursing rooms (department stores, akachan honpo), konbini/baby food, Pokémon/Ghibli/theme parks, free playgrounds
+  (the Chansey/Lapras parks from the Pokémon post), pacing a day with naps, jetlag with kids. Pairs with a "with kids" 14-day plan.
 - [ ] Off-the-beaten-path guide as a standalone product / post-purchase upsell (only places you've been)
 - [ ] Seasonal guides as free email lead magnets (e.g. cherry blossom 2027)
 - [ ] **Illustrations for the guide** (real illustrator, not AI: the FAQ sells first-hand, human picks)
