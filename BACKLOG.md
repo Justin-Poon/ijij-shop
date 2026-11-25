@@ -2,7 +2,7 @@
 
 ## Go-live (waiting on Stripe phone verification, back from overseas)
 Live Stripe is ready: products, JAPLAN10, and a webhook to shop.itsjustinjapan.com (`we_1Ue7BQAg0KVyXnxVL1OMBtNn`, live). To flip:
-1. In `wrangler.toml`, set `STRIPE_PRICE_BUNDLE = price_1UeOKMAg0KVyXnxVknA6ZWKE` and `STRIPE_PRICE_UPGRADE = price_1UeOGmAg0KVyXnxVOLfnipdc` (US$30 and US$10; the old A$ live prices are no longer used)
+1. In `wrangler.toml`, set `STRIPE_PRICE_BUNDLE = price_1UfTzlAg0KVyXnxV0cWRA5fd` and `STRIPE_PRICE_UPGRADE = price_1UeOGmAg0KVyXnxVOLfnipdc` (US$40 and US$10; the old A$ live prices are no longer used)
 2. Worker secrets: `STRIPE_PUBLISHABLE_KEY` = pk_live, `STRIPE_SECRET_KEY` = sk_live, `STRIPE_WEBHOOK_SECRET` = the live webhook's signing secret (Stripe → Developers → Webhooks)
 3. Clear the test orders and events from D1, do one real purchase and refund it, then update the bio links
 
@@ -25,7 +25,7 @@ Live Stripe is ready: products, JAPLAN10, and a webhook to shop.itsjustinjapan.c
 - [x] Decide which payment methods to offer: Stripe currently shows card, Link, Klarna and Zip (Stripe Dashboard → Settings → Payment methods)
 - [ ] **Go live** (domain: `shop.itsjustinjapan.com`; itsjustinjapan.com is already on this Cloudflare account)
   - [x] Attach `shop.itsjustinjapan.com` to the `ijij-shop` Worker; set `SITE_URL` to it (21 Nov)
-  - [ ] Stripe live mode: products (US$30 bundle, US$10 upgrade), JAPLAN10 coupon + promo code, webhook → `https://shop.itsjustinjapan.com/api/stripe-webhook`
+  - [ ] Stripe live mode: products (US$40 bundle, US$10 upgrade), JAPLAN10 coupon + promo code, webhook → `https://shop.itsjustinjapan.com/api/stripe-webhook`
   - [ ] Live keys as Worker secrets (`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`); live price IDs in `wrangler.toml`
   - [ ] Stripe → Settings → Payment method domains: add `shop.itsjustinjapan.com` (Apple Pay / Google Pay)
   - [ ] One real purchase with your own card, then refund it
