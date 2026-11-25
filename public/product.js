@@ -4,6 +4,19 @@
   const $ = (id) => document.getElementById(id);
   const form = $("checkout");
   const btn = $("purchase");
+  // ---- Listing-image A/B test: version B shows the image gallery instead of the cover.
+  // Preview only for now (?v=b); a random 50/50 split gets switched on at launch.
+  if (new URLSearchParams(location.search).get("v") === "b") {
+    document.body.classList.add("v-b");
+    const g = $("gallery"), track = $("g-track"), dots = $("g-dots");
+    if (g && track && dots) {
+      g.hidden = false;
+      const imgs = [...track.children];
+      imgs.forEach((_, i) => { const d = document.createElement("button"); d.setAttribute("aria-label", `Image ${i + 1}`); d.onclick = () => track.scrollTo({ left: track.clientWidth * i, behavior: "smooth" }); dots.append(d); });
+      const mark = () => { const i = Math.round(track.scrollLeft / track.clientWidth); [...dots.children].forEach((d, j) => d.classList.toggle("on", j === i)); };
+      track.addEventListener("scroll", mark, { passive: true }); mark();
+    }
+  }
   const state = { upgrade: false, code: "", total: null, currency: "usd", stripe: null, elements: null, busy: false, turnstile: "", turnstileId: null };
 
   // ---- Attribution -------------------------------------------------------------------

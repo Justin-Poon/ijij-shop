@@ -78,6 +78,16 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: 24px 0; }
   .cover-img { width: 240px; }
 }
 
+/* ---- Gallery (version B of the listing-image A/B test) ---------------------------------- */
+.gallery { margin: 10px 0 18px; }
+.g-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; border-radius: 14px; scrollbar-width: none; }
+.g-track::-webkit-scrollbar { display: none; }
+.g-track img { flex: 0 0 100%; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; scroll-snap-align: center; border-radius: 14px; display: block; }
+.g-dots { display: flex; gap: 6px; justify-content: center; margin-top: 10px; }
+.g-dots button { width: 8px; height: 8px; border-radius: 50%; border: 0; padding: 0; background: var(--rule, #ddd); cursor: pointer; }
+.g-dots button.on { background: var(--maroon, #6b1234); }
+body.v-b .cover-wrap { display: none; }
+
 /* ---- Title, price, description ------------------------------------------------------ */
 .title { font-size: 1.55rem; line-height: 1.25; font-weight: 700; color: var(--ink); margin: 0 0 8px; letter-spacing: -.01em; }
 .price { font-size: 1.45rem; font-weight: 700; color: var(--maroon); margin: 0; min-height: 1.5em; }

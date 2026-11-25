@@ -16,3 +16,5 @@ Done: 01 hero · 02 planner · 03 neighbourhoods · 04 what to book · 05 mistak
 Background options (blurred Japanese photos, Unsplash): shoji = De An Sun, tatami = Yosuke Ota, kyoto = Fabrizio Chiagano. See options/.
 
 Previews blur page body text below each page heading (src/*-b.png, Gaussian 7px) so the listing shows layout, not content. No eyebrow labels above titles.
+
+A/B: version B (gallery of these images) is live as a preview at shop.itsjustinjapan.com/?v=b. The random 50/50 split + tracking is not switched on yet.
