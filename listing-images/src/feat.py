@@ -1,13 +1,13 @@
 import json, sys
 F = {
  "02-planner": dict(kicker="Included", title="A <em>14-day</em> plan,<br>ready to go",
-   pts=[("Day by day","Hotels, restaurants and things to do, all mapped out"),
+   pts=[("Day by day","Hotels, food and things to do, mapped out"),
         ("Yours to change","A Canva template: swap days, cities and activities"),
         ("Or keep it loose","How to split 7, 10 or 14 days if you'd rather wing it")],
    pages=["p6-006.png","p96-096.png"]),
  "03-tokyo": dict(kicker="Where to go", title="Every<br><em>neighbourhood</em><br>explained",
-   pts=[("Tokyo, area by area","What each neighbourhood is like and what to do there"),
-        ("Six more places","Hakone, Kyoto, Osaka, Nara, Kamakura and beyond"),
+   pts=[("Tokyo, area by area","What each area is like and what to do"),
+        ("Six more places","Hakone, Kyoto, Osaka, Nara and more"),
         ("My favourite spots","The places I'd send a friend, from my own trips")],
    pages=["p76-076.png","p77-077.png"]),
  "04-book": dict(kicker="Before you go", title="What to <em>book</em><br>and when",

@@ -5,6 +5,7 @@ Look (v2, after Justin found v1 cluttered): **restraint**. A real photographed p
 the title left in Instrument Serif with one maroon (#6b1234) italic word, a thin rule, three quiet lines of Outfit, and the guide
 as large printed pages on the right. No pills, arrows, devices or stamp. One idea per image.
 
+Chosen look: blurred shoji background (src/hero-shoji.html + feat.css), large dark text on a cream fade for readability at thumbnail size.
 Build: edit `src/*.html` (pages come from japan-the-complete-guide.pdf via `pdftoppm -r 130`), then
 `node src/shot.cjs $PWD/src/heroA.html out.png` (hero.html is the rejected v1).
 
