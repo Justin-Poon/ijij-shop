@@ -1,0 +1,50 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:IS;src:url(instrument-serif.woff2)}
+@font-face{font-family:IS;font-style:italic;src:url(instrument-serif-italic.woff2)}
+@font-face{font-family:Outfit;src:url(outfit.woff2);font-weight:100 900}
+*{box-sizing:border-box;margin:0}
+body{width:2000px;height:1500px;overflow:hidden;position:relative;font-family:Outfit;color:#3a1020;
+ background:radial-gradient(1400px 900px at 70% 20%,#fbf6ef 0%,#f3eadd 55%,#e9dccb 100%)}
+/* soft window-light shadows */
+.shade{position:absolute;inset:0;pointer-events:none;
+ background:repeating-linear-gradient(118deg,transparent 0 160px,rgba(120,90,60,.07) 160px 230px,transparent 230px 330px);
+ mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 75%)}
+.leaf{position:absolute;right:-60px;top:-80px;width:620px;height:620px;border-radius:50%;
+ background:radial-gradient(closest-side,rgba(90,70,40,.10),transparent);filter:blur(30px)}
+/* wooden table */
+.table{position:absolute;left:0;right:0;bottom:0;height:430px;
+ background:linear-gradient(180deg,#d7b991 0%,#c9a679 40%,#b98f62 100%);
+ box-shadow:inset 0 14px 30px rgba(80,50,20,.25)}
+.table:before{content:"";position:absolute;inset:0;opacity:.35;
+ background:repeating-linear-gradient(178deg,transparent 0 22px,rgba(120,80,40,.25) 22px 24px,transparent 24px 60px)}
+.head{position:absolute;top:92px;left:0;right:0;text-align:center}
+.kicker{font-size:26px;letter-spacing:.32em;text-transform:uppercase;color:#8a6a58}
+h1{font-family:IS;font-weight:400;font-size:118px;line-height:1;margin-top:18px;color:#3a1020;letter-spacing:-.01em}
+h1 em{color:#6b1234}
+.pills{display:flex;gap:18px;justify-content:center;margin-top:34px}
+.pill{border:1.5px solid #6b1234;border-radius:999px;padding:12px 26px;font-size:24px;letter-spacing:.14em;text-transform:uppercase;color:#6b1234;background:rgba(255,255,255,.45)}
+.page{position:absolute;background:#fff;box-shadow:0 30px 60px rgba(60,30,10,.28),0 6px 14px rgba(60,30,10,.18);border-radius:4px;overflow:hidden}
+.page img{width:100%;height:100%;object-fit:cover;display:block}
+.ipad{position:absolute;background:#1b1b1d;border-radius:44px;padding:26px;box-shadow:0 40px 80px rgba(50,25,10,.35)}
+.ipad img{display:block;width:100%;height:100%;object-fit:cover;border-radius:18px}
+.phone{position:absolute;background:#1b1b1d;border-radius:56px;padding:16px;box-shadow:0 36px 70px rgba(50,25,10,.38)}
+.phone img{display:block;width:100%;height:100%;object-fit:cover;object-position:top;border-radius:42px}
+.note{position:absolute;font-family:IS;font-style:italic;font-size:40px;color:#6b1234}
+.note svg{position:absolute}
+.stamp{position:absolute;right:70px;top:60px;width:150px;opacity:.55}
+</style></head><body>
+<div class="shade"></div><div class="leaf"></div><div class="table"></div>
+<img class="stamp" src="stamp.svg">
+<div class="head">
+ <div class="kicker">itsjustinjapan · 2027 edition</div>
+ <h1>The <em>complete</em> guide to Japan</h1>
+ <div class="pills"><span class="pill">102-page guide</span><span class="pill">14-day planner included</span><span class="pill">Written from my own trips</span></div>
+</div>
+<div class="page" style="left:170px;top:600px;width:440px;height:622px;transform:rotate(-9deg)"><img src="p67-067.png"></div>
+<div class="page" style="left:1450px;top:580px;width:440px;height:622px;transform:rotate(8deg)"><img src="p82-082.png"></div>
+<div class="page" style="left:470px;top:520px;width:500px;height:707px;transform:rotate(-3deg)"><img src="p1-001.png"></div>
+<div class="ipad" style="left:1010px;top:570px;width:520px;height:705px"><img src="p96-096.png"></div>
+<div class="phone" style="left:1500px;top:780px;width:280px;height:570px"><img src="p76-076.png"></div>
+<div class="note" style="left:120px;top:455px">102 pages of tips<svg width="140" height="90" style="left:250px;top:45px" viewBox="0 0 140 90"><path d="M10 10 C60 20 100 40 120 80" stroke="#6b1234" stroke-width="3" fill="none"/><path d="M106 70 L120 80 L124 63" stroke="#6b1234" stroke-width="3" fill="none"/></svg></div>
+<div class="note" style="left:1640px;top:455px">real local picks<svg width="120" height="140" style="left:10px;top:55px" viewBox="0 0 120 140"><path d="M90 8 C70 50 50 90 30 130" stroke="#6b1234" stroke-width="3" fill="none"/><path d="M20 116 L30 130 L44 120" stroke="#6b1234" stroke-width="3" fill="none"/></svg></div>
+</body></html>
