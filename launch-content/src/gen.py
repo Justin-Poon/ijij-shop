@@ -18,6 +18,7 @@ li span:last-child{font-size:36px;line-height:1.25}
 .pg{position:absolute;background:#fff;border-radius:3px;overflow:hidden}
 .pg img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
 .brand{position:absolute;left:0;right:0;bottom:BRpx;text-align:center;font-family:IS;font-style:italic;font-size:34px;color:#5e4a40}
+.tag{font-family:IS;font-style:italic;font-size:50px;color:#6b1234;margin-top:18px}
 .cta{display:inline-block;margin-top:40px;background:#6b1234;color:#fff;border-radius:999px;padding:22px 48px;font-size:34px;letter-spacing:.06em}
 '''
 def page(w,h,top,feat,two=True,pw=500):
@@ -28,9 +29,10 @@ def page(w,h,top,feat,two=True,pw=500):
     a,b=imgs
     return (f'<div class="pg" style="left:{cx-pw+40}px;top:{top}px;width:{pw}px;height:{ph}px;transform:rotate(-6deg);box-shadow:-20px 40px 60px rgba(70,45,25,.22)"><img src="{b}"></div>'
             f'<div class="pg" style="left:{cx-60}px;top:{top+60}px;width:{pw}px;height:{ph}px;transform:rotate(4deg);box-shadow:-30px 50px 80px rgba(70,45,25,.30)"><img src="{a}"></div>')
-def make(name,w,h,title,fs,top,pts=None,sub=None,pages=None,ptop=700,pw=500,cta=None,br=60,extra=""):
+def make(name,w,h,title,fs,top,pts=None,sub=None,pages=None,ptop=700,pw=500,cta=None,br=60,extra="",tag=None):
     css=CSS.replace("W px",f"{w}px").replace("H px",f"{h}px").replace("TOP",str(top)).replace("FS",str(fs)).replace("BR",str(br))
     body=f'<h1>{title}</h1>'
+    if tag: body+=f'<div class="tag">{tag}</div>'
     if sub: body+=f'<div class="sub">{sub}</div>'
     if pts: body+='<div class="line"></div><ol>'+"".join(f'<li><span class="n">{i+1}</span><span>{p}</span></li>' for i,p in enumerate(pts))+'</ol>'
     if cta: body+=f'<div class="cta">{cta}</div>'
@@ -43,13 +45,13 @@ FEATS=[("A <em>14-day</em> plan,<br>ready to go",["Hotels, food and things to do
  ("Spend <em>smarter</em>",["What to budget per day","The new 2026 tax-free rules","What's worth the suitcase space"],["p32-032-b.png","p26-026-b.png"]),
  ("Eat like a <em>local</em>",["How to order anywhere","Konbini favourites","Special diets"],["p70-070-b.png","p72-072-b.png"])]
 # ---- Pinned carousel 1080x1350
-make("c01",1080,1350,"The <em>complete</em><br>guide to Japan",128,110,sub="I rewrote my Japan guide from scratch.<br>Here's what's inside 👉",pages=["p1-001.png"],ptop=560,pw=480)
+make("c01",1080,1350,"The <em>complete</em><br>guide to Japan",128,100,tag="The good stuff I’d only tell a friend",sub="I rewrote my Japan guide from scratch.<br>Here's what's inside 👉",pages=["p1-001.png"],ptop=640,pw=460)
 for i,(t,p,pg) in enumerate(FEATS):
     make(f"c{i+2:02d}",1080,1350,t,104,90,pts=p,pages=pg,ptop=720,pw=430)
 make("c08",1080,1350,"102 pages,<br>made for <em>your</em> trip",112,170,sub="Guide + 14-day planner<br>Instant download · phone or print",cta="Link in bio",pages=["p1-001.png"],ptop=760,pw=380)
 # ---- Story pack 1080x1920 (leave the lower third clear for a link sticker)
 make("s01-teaser",1080,1920,"Something<br>I've been <em>working on</em> 👀",120,260,sub="My Japan guide, rewritten from scratch.<br>More soon.",pages=["p76-076-b.png","p96-096-b.png"],ptop=920,pw=470,br=90)
-make("s02-live",1080,1920,"It's <em>here</em>",170,220,sub="The complete guide to Japan<br>+ 14-day planner",pages=["p1-001.png"],ptop=720,pw=560,br=90)
+make("s02-live",1080,1920,"It's <em>here</em>",170,220,tag="The good stuff I’d only tell a friend",sub="The complete guide to Japan<br>+ 14-day planner",pages=["p1-001.png"],ptop=720,pw=560,br=90)
 for i,(t,p,pg) in enumerate(FEATS[:4]):
     make(f"s{i+3:02d}-feature",1080,1920,t,120,200,pts=p,pages=pg,ptop=900,pw=470,br=90)
 make("s07-waitlist",1080,1920,"On the <em>waitlist</em>?",140,300,sub="Your launch-day thank-you is in your inbox.<br>Check your email (and spam) 💌",pages=["p1-001.png"],ptop=820,pw=460,br=90)
