@@ -8,5 +8,6 @@ as large printed pages on the right. No pills, arrows, devices or stamp. One ide
 Build: edit `src/*.html` (pages come from japan-the-complete-guide.pdf via `pdftoppm -r 130`), then
 `node src/shot.cjs $PWD/src/heroA.html out.png` (hero.html is the rejected v1).
 
-Planned set: 01 hero · 02 day-by-day itinerary · 03 food & activity picks · 04 areas & where to stay ·
+Feature images (calm look + feature-led, like the reference): `python3 src/feat.py` writes 02–05 HTML; render each with shot.cjs.
+Done: 01 hero · 02 planner · 03 neighbourhoods · 04 what to book · 05 mistakes. Still to do: 06 proof (reviews) · 07 what you get.
 05 the Canva planner · 06 tips you only learn the hard way · 07 proof (5,000+ travellers, reviews) · 08 what you get.
