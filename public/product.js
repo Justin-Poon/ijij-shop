@@ -4,15 +4,24 @@
   const $ = (id) => document.getElementById(id);
   const form = $("checkout");
   const btn = $("purchase");
-  // ---- Listing-image A/B test: version B shows the image gallery instead of the cover.
-  // Preview only for now (?v=b); a random 50/50 split gets switched on at launch.
-  if (new URLSearchParams(location.search).get("v") === "b") {
+  // ---- Listing-image A/B test --------------------------------------------------------
+  // Each visitor is put in version A (cover only) or B (image gallery) at random, 50/50, and stays
+  // there (remembered in this browser). ?v=a / ?v=b forces a version. The version is sent with the
+  // page view and the checkout, so the shop admin can compare which one sells better.
+  const variant = (function () {
+    const forced = new URLSearchParams(location.search).get("v");
+    let v = forced === "a" || forced === "b" ? forced : null;
+    try { v = v || localStorage.getItem("ijij-ab"); } catch {}
+    if (v !== "a" && v !== "b") v = Math.random() < 0.5 ? "a" : "b";
+    try { localStorage.setItem("ijij-ab", v); } catch {}
+    return v;
+  })();
+  if (variant === "b") {
     document.body.classList.add("v-b");
     const g = $("gallery"), track = $("g-track"), dots = $("g-dots");
     if (g && track && dots) {
       g.hidden = false;
-      const imgs = [...track.children];
-      imgs.forEach((_, i) => { const d = document.createElement("button"); d.setAttribute("aria-label", `Image ${i + 1}`); d.onclick = () => track.scrollTo({ left: track.clientWidth * i, behavior: "smooth" }); dots.append(d); });
+      [...track.children].forEach((_, i) => { const d = document.createElement("button"); d.setAttribute("aria-label", `Image ${i + 1}`); d.onclick = () => track.scrollTo({ left: track.clientWidth * i, behavior: "smooth" }); dots.append(d); });
       const mark = () => { const i = Math.round(track.scrollLeft / track.clientWidth); [...dots.children].forEach((d, j) => d.classList.toggle("on", j === i)); };
       track.addEventListener("scroll", mark, { passive: true }); mark();
     }
@@ -41,7 +50,7 @@
   fetch("/api/track", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ source: attribution.source, campaign: attribution.campaign, referrer: attribution.referrer, visitor: attribution.visitor }),
+    body: JSON.stringify({ source: attribution.source, campaign: attribution.campaign, referrer: attribution.referrer, visitor: attribution.visitor, variant }),
     keepalive: true,
   })
     .then((r) => (r.ok ? r.json() : null))
@@ -175,7 +184,7 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name, email, marketing: $("marketing").checked, upgrade: state.upgrade, code: state.code,
-          source: attribution.source, campaign: attribution.campaign, visitor: attribution.visitor, turnstile: state.turnstile,
+          source: attribution.source, campaign: attribution.campaign, visitor: attribution.visitor, variant, turnstile: state.turnstile,
         }),
       });
       const d = await r.json();

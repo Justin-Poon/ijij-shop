@@ -17,4 +17,4 @@ Background options (blurred Japanese photos, Unsplash): shoji = De An Sun, tatam
 
 Previews blur page body text below each page heading (src/*-b.png, Gaussian 7px) so the listing shows layout, not content. No eyebrow labels above titles.
 
-A/B: version B (gallery of these images) is live as a preview at shop.itsjustinjapan.com/?v=b. The random 50/50 split + tracking is not switched on yet.
+A/B test is LIVE: half of visitors see A (cover only), half B (gallery of these images), remembered per browser; ?v=a / ?v=b forces one. Results: shop admin → Shop → "A/B test: listing images".

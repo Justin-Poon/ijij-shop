@@ -63,10 +63,13 @@ export function cleanCampaign(v: unknown): string | null {
   return typeof v === "string" && /^[a-zA-Z0-9 ._-]{1,60}$/.test(v) ? v.trim() : null;
 }
 
-export async function recordEvent(env: Env, e: { event: "view" | "checkout"; source: string; visitor: string | null; campaign: string | null }) {
+/** Listing-image A/B test version: "a" or "b", anything else is dropped. */
+export const cleanVariant = (v: unknown): string | null => (v === "a" || v === "b" ? v : null);
+
+export async function recordEvent(env: Env, e: { event: "view" | "checkout"; source: string; visitor: string | null; campaign: string | null; variant?: string | null }) {
   const now = new Date();
-  await env.DB.prepare(`INSERT INTO events (ts, day, event, source, visitor, campaign) VALUES (?, ?, ?, ?, ?, ?)`)
-    .bind(now.toISOString(), melbourneDay(now), e.event, e.source, e.visitor, e.campaign)
+  await env.DB.prepare(`INSERT INTO events (ts, day, event, source, visitor, campaign, variant) VALUES (?, ?, ?, ?, ?, ?, ?)`)
+    .bind(now.toISOString(), melbourneDay(now), e.event, e.source, e.visitor, e.campaign, e.variant ?? null)
     .run();
 }
 

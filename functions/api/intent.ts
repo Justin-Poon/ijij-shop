@@ -6,7 +6,7 @@ import type { Env } from "../../src/env.ts";
 import { quote } from "../../src/pricing.ts";
 import { createPaymentIntent, StripeError } from "../../src/stripe.ts";
 import { json } from "../../src/util.ts";
-import { allowed, cleanCampaign, cleanVisitor, detectSource, normaliseSource, recordEvent, turnstileOk } from "../../src/analytics.ts";
+import { allowed, cleanCampaign, cleanVisitor, detectSource, normaliseSource, recordEvent, turnstileOk, cleanVariant } from "../../src/analytics.ts";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -20,6 +20,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     source?: string;
     visitor?: string;
     campaign?: string;
+    variant?: string;
     turnstile?: string;
   };
   // Slow down card-testing bots: a few attempts per minute per visitor, plus a human check.
@@ -34,6 +35,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     normaliseSource(b.source) ?? detectSource({ userAgent: request.headers.get("User-Agent"), referrer: request.headers.get("Referer") });
   const visitor = cleanVisitor(b.visitor);
   const campaign = cleanCampaign(b.campaign);
+  const variant = cleanVariant(b.variant);
 
   try {
     const q = await quote(env, { upgrade: !!b.upgrade, code: b.code });
@@ -56,9 +58,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         source,
         visitor: visitor ?? "",
         campaign: campaign ?? "",
+        variant: variant ?? "",
       },
     });
-    await recordEvent(env, { event: "checkout", source, visitor, campaign }).catch((e) => console.error("event failed", e));
+    await recordEvent(env, { event: "checkout", source, visitor, campaign, variant }).catch((e) => console.error("event failed", e));
     return json({ clientSecret: pi.client_secret, amount: q.total, currency: q.currency });
   } catch (err) {
     console.error("intent failed", err);

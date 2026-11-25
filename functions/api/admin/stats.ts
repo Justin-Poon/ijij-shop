@@ -48,6 +48,23 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     .bind(sinceDay)
     .all<{ day: string; visitors: number }>();
 
+  // Listing-image A/B test: same funnel split by page version (a = cover only, b = image gallery).
+  const abEv = await env.DB.prepare(
+    `SELECT variant,
+            COUNT(DISTINCT CASE WHEN event='view' THEN COALESCE(visitor, CAST(id AS TEXT)) END) AS visitors,
+            COUNT(DISTINCT CASE WHEN event='checkout' THEN COALESCE(visitor, CAST(id AS TEXT)) END) AS checkouts
+       FROM events WHERE day >= ? AND variant IS NOT NULL GROUP BY variant`,
+  ).bind(sinceDay).all<{ variant: string; visitors: number; checkouts: number }>();
+  const abOrd = await env.DB.prepare(
+    `SELECT variant, COUNT(*) AS orders, SUM(amount_total) AS revenue
+       FROM orders WHERE refunded_at IS NULL AND created_at >= ? AND variant IS NOT NULL GROUP BY variant`,
+  ).bind(sinceIso).all<{ variant: string; orders: number; revenue: number }>();
+  const ab = ["a", "b"].map((v) => {
+    const e = abEv.results.find((r) => r.variant === v), o = abOrd.results.find((r) => r.variant === v);
+    const visitors = e?.visitors ?? 0, orders = o?.orders ?? 0;
+    return { variant: v, visitors, checkouts: e?.checkouts ?? 0, orders, revenue: o?.revenue ?? 0, conversion: visitors ? orders / visitors : null };
+  });
+
   const by = new Map<string, Row>();
   const get = (s: string) => {
     if (!by.has(s)) by.set(s, { source: s, visitors: 0, views: 0, checkouts: 0, orders: 0, revenue: 0, upgrades: 0 });
@@ -63,5 +80,5 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   );
   const rate = (r: Row) => ({ ...r, conversion: r.visitors ? r.orders / r.visitors : null, upgradeRate: r.orders ? r.upgrades / r.orders : null });
 
-  return json({ days, since: sinceDay, currency: "usd", sources: rows.map(rate), total: rate(total), daily: daily.results });
+  return json({ days, since: sinceDay, currency: "usd", sources: rows.map(rate), total: rate(total), daily: daily.results, ab });
 };
