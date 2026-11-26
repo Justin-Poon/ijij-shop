@@ -89,3 +89,9 @@ Live Stripe is ready: products, JAPLAN10, and a webhook to shop.itsjustinjapan.c
 - [ ] **Waitlist was promised a discount** (page, banner, confirmation): create a Stripe coupon and email the code on launch day
 - [ ] Resend: verify the sending domain (DNS records), create an Audience, import waitlist.csv before launch
 - [ ] Optional: send each new sign-up to Resend automatically (needs a RESEND_API_KEY secret) and a welcome email
+
+## Current planners on Gumroad (26 Nov, from Justin)
+- 14-day: https://justinjapan.gumroad.com/l/editable-14-day
+- 21-day: https://justinjapan.gumroad.com/l/editable-21-day
+- Justin is *considering* swapping the bio link (itsjustinjapan.com) between Gumroad and Etsy. **Wait for him to say so** before changing anything.
+
