@@ -24,6 +24,8 @@
       [...track.children].forEach((_, i) => { const d = document.createElement("button"); d.setAttribute("aria-label", `Image ${i + 1}`); d.onclick = () => track.scrollTo({ left: track.clientWidth * i, behavior: "smooth" }); dots.append(d); });
       const mark = () => { const i = Math.round(track.scrollLeft / track.clientWidth); [...dots.children].forEach((d, j) => d.classList.toggle("on", j === i)); };
       track.addEventListener("scroll", mark, { passive: true }); mark();
+      const go = (d) => { const n = track.children.length, i = Math.round(track.scrollLeft / track.clientWidth); track.scrollTo({ left: track.clientWidth * ((i + d + n) % n), behavior: "smooth" }); };
+      $("g-prev").onclick = () => go(-1); $("g-next").onclick = () => go(1);
     }
   }
   const state = { upgrade: false, code: "", total: null, currency: "usd", stripe: null, elements: null, busy: false, turnstile: "", turnstileId: null };
